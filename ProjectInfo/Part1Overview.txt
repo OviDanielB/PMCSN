@@ -1,0 +1,28 @@
+Empirical test of randomness
+Consider a Lehmer generator by choosing a multiplier a, with a≠48271 and a≠16807.
+Following the guidelines of Chapter 10 of the textbook1, test the chosen Lehmer generator
+for randomness by selecting one of the six standard tests presented in Section 10.1.
+
+m = 2^31 − 1 = 2 147 483 647
+
+The a multiplier should be :
+    1) full-period (if and only if the fundamental period p is m−1)
+        If the sequence x0, x1, x2, . . . has a full period then any m − 1 consecutive terms in the sequence
+        have been drawn without replacement from the set Xm. In effect a full-period Lehmer generator creates
+        a virtual circular list with m − 1 distinct elements. The initial seed provides a starting list element;
+        subsequent calls to the generator traverse the list.
+
+
+
+
+
+FULL-PERIOD
+If m is prime and p1, p2, . . . , pr
+are the (unique) prime factors of m − 1 then the number of full-period multipliers in Xm is
+(p1 −1)(p2 −1)...(pr −1)
+------------------------ * (m-1)
+      p1p2...pr
+
+
+once one full-period multiplier has been found,
+then all the others can be found using the following O(m) algorithm
