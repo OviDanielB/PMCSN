@@ -15,7 +15,6 @@ int full_period_check(long a, long m)
  * if a is a full-period multiplier relative to the prime modulus m
  * =================================================================
  */
-
 {
     long p = 1;
     long x = a;
