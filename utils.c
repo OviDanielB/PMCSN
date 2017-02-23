@@ -18,3 +18,16 @@ int is_prime(long num)
     }
     return 1; /* is prime */
 }
+
+long gcd ( long a, long b )
+/* ============================================
+ * find the Greatest Common Divisor of a and b
+ * ============================================
+ */
+{
+    long c;
+    while ( a != 0 ) {
+        c = a; a = b%a;  b = c;
+    }
+    return b;
+}
