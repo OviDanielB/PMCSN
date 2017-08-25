@@ -51,9 +51,23 @@ int test_g(){
 
 }
 
+int test_succ_full_period_modulus_compatible_multi(){
+
+    int sm_a = 7;
+    find_succ_full_period(&sm_a,&m,NULL);
+}
+
 int main(int argc, char **argv){
 
+    long fp_mc_mult[5] = {7, 16807, 41214, 25697, 63295};
+
     printf("BEGINNING TEST SUITE\n");
+    int i;
+    for(i = 0; i < 5; i++){
+
+        printf("TEST a = %ld is modulus compatible,full period multiplier to m = %ld : %s", fp_mc_mult[i], m, (full_period_check(&fp_mc_mult[i], &m)) ? PASS : NOT_PASS);
+
+    }
 
     printf("TEST G(x,a,m) : %s \n", (test_g() == 1) ? PASS : NOT_PASS);
     printf("TEST find_first_fc_mc(m) : %s \n", (test_find_first_fp_mc() == 1) ? PASS : NOT_PASS);

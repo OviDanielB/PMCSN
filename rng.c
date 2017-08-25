@@ -32,7 +32,7 @@ long g(long *x, long *a,long *m)
    // printf(" G ==> %s \n", (*m == *a * q + r) ? "TRUE" :  "FALSE");
     t = *a * (*x % q) - r * ( (long) floor(*x / q) );
 
-    printf("G :   q = %ld, r= %ld, t = %ld , a*xmodm = %ld \n", q,r,t, *a * *x % *m);
+    //printf("G :   q = %ld, r= %ld, t = %ld , a*xmodm = %ld \n", q,r,t, *a * *x % *m);
     if(t > 0){
         return t;
     } else {
@@ -65,7 +65,8 @@ int full_period_check(long *a, long *m)
         p++;
         tmp = x;
         x = g(&tmp, a, m); /* avoid possible overflow  */
-        printf("a = %ld , m = %ld, g(x) = %ld, count = %ld\n", *a,*m, x,p);
+        //printf("a = %ld , m = %ld, g(x) = %ld, count = %ld\n", *a,*m, x,p);
+        printf("completed %f percent \r", p * 1.0 / *m * 100.0);
     }
 
     if(p == *m - 1) return 1; /* a is a full period multiplier for m */
@@ -92,12 +93,12 @@ int find_succ_full_period(long *a, long *m, long *fp_arr)
 
     long i = 1, x = *a;
 
-    (fp_arr++);
-    fp_arr--;
+    //(fp_arr++);
+    //fp_arr--;
 
 
     while (x != 1){
-        if(gcd(i, *m - 1) == 1){ /* x is a full-period multiplier of m */
+        if( (gcd(i, *m - 1) == 1) && (*m % x < *m / x)){ /* x is a full-period multiplier of m */
             // TODO insert into array
             printf("x = %ld\n",x);
         }
