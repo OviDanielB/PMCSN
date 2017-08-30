@@ -3,6 +3,7 @@
 //
 #include <stdio.h>
 
+
 #include "../rng.h"
 
 #define TEST_G_N 1000
@@ -71,6 +72,5 @@ int main(int argc, char **argv){
 
     printf("TEST G(x,a,m) : %s \n", (test_g() == 1) ? PASS : NOT_PASS);
     printf("TEST find_first_fc_mc(m) : %s \n", (test_find_first_fp_mc() == 1) ? PASS : NOT_PASS);
-
 
 }

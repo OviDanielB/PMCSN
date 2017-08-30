@@ -10,3 +10,4 @@
 
 int is_prime(long num);
 long gcd(long a,long b);
+long fact(int x);

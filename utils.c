@@ -4,6 +4,22 @@
 
 #import <math.h>
 
+long fact(int x){
+    int c;
+    long fact = 1;
+
+    if(x <= 0){
+        return 1;
+    }
+
+    for(c = 1; c <= x; c++){
+        fact = fact * c;
+    }
+
+    return fact;
+
+}
+
 int is_prime(long num)
 /* ========================================
  * naive check of primality
