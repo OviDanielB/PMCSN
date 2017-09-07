@@ -1,17 +1,16 @@
-#include <stdio.h>
 
-#include "utils.h"
-#include "rng.h"
+#include "utils/constants.h"
+#include "event_time_generator.h"
 
 
-// TODO : add main.c to SOURCE_FILES in CmakeLists.txt (now is compiling testSuite.c as main function)
 int main() {
-    //printf(" %d %d \n", is_prime(231), full_period_check(21, 213));
-    long a = 48271;
-    long m = 2147483647;
 
-    int cond = 0;
-    //find_succ_full_period(a,m,NULL);
+
+    /* plants a seed for the stream generator (automatically generates seed for every stream) */
+    PlantSeeds(SEED);
+
+    printf("Arrival Time Class 1 : %.2f \n", getArrivalClass1());
+    printf("Arrival Time Class 2 : %.2f \n", getArrivalClass2());
 
     return 0;
 }

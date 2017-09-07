@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 
-#include "../rng.h"
+#include "../utils/rng_utils.h"
 
 #define TEST_G_N 1000
 #define PASS "PASSED"

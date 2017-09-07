@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "rng_lib/rngs.h"
-#include "utils.h"
-#include "rng_lib/rvms.h"
+#include "../rng_lib/rngs.h"
+#include "../utils/utils.h"
+#include "../rng_lib/rvms.h"
 
 
 
