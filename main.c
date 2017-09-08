@@ -157,7 +157,7 @@ void next_arrival(int class_event){
     }
 }
 
-void execute(struct event *arrival_event, int action) {
+void execute_arrival(struct event *arrival_event, int action) {
 
     time.current = arrival_event->time;
 
@@ -215,12 +215,48 @@ void execute(struct event *arrival_event, int action) {
 
 }
 
+void execute_completion(struct event *event) {
+
+    time.current = event->time;
+
+    switch (event->type) {
+        case EVENT_CLASS_1_CLOUDLET_COMPLETION:
+            state.cldlet_1--;
+            completed.cloudlet_class_1++;
+            // TODO
+
+            break;
+        case EVENT_CLASS_2_CLOUDLET_COMPLETION:
+            state.cldlet_2--;
+            completed.cloudlet_class_2++;
+            // TODO
+
+            break;
+        case EVENT_CLASS_1_CLOUD_COMPLETION:
+            state.cloud_1--;
+            completed.cloud_class_1++;
+            // TODO
+
+            break;
+        case EVENT_CLASS_2_CLOUD_COMPLETION:
+            state.cloud_2--;
+            completed.cloud_class_2++;
+            // TODO
+
+            break;
+        default:
+            fprintf(stderr, "No completion type matching!\n");
+    }
+}
+
 void process_event(struct event * event) {
 
     int dispatch_action;
     if(is_arrival(event)){
         dispatch_action = dispatch(event);
-        execute(event,dispatch_action);
+        execute_arrival(event, dispatch_action);
+    } else { /* completion */
+        execute_completion(event);
     }
 }
 
@@ -250,9 +286,6 @@ int main(int argc, char **argv) {
         }
 
     }
-
-    printf("Arrival Time Class 1 : %.2f \n", getArrivalClass1());
-    printf("Arrival Time Class 2 : %.2f \n", getArrivalClass2());
 
     return 0;
 }

@@ -16,7 +16,6 @@ void init_output_stats() {
         fprintf(stderr, "error in memory allocation\n");
         exit(EXIT_FAILURE);
     }
-
     t_star = idfStudent(batch_number - 1, 1 - ALPHA / 2);
 }
 
