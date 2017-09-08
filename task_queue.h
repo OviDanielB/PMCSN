@@ -30,16 +30,7 @@ void set_policy(int p);
  * Print all tasks in the queue.
  */
 void print_events();
-/**
- * Print all tasks in the queue in reverse order.
- */
-void print_events_reverse();
-/**
- * Allocation of an element in the queue.
- *
- * @return allocated task
- */
-struct event *alloc_event();
+
 /**
  * Insert a new task at the head of the queue.
  * @param new task
@@ -50,12 +41,7 @@ void insert_first(struct event *new);
  * @param new task
  */
 void insert_last(struct event *new);
-/**
- * Deallocation of an element in the queue
- *
- * @param t
- */
-void free_event(struct event *t);
+
 /**
  * Remove a task from the queue at the first or at the last position in the queue.
  * @param p
@@ -80,20 +66,10 @@ struct event *remove_first_event_by_type(int type);
  * @return task
  */
 struct event *pop_event();
-/**
- * Push a new task as the last item in the queue
- * @param new
- * @param next
- */
-void insert_after_event(struct event *new, struct event *p);
-/**
- * Insert a new task sorting by time value.
- * @param new task
- */
-void insert_sorted_queue(struct event *new);
+
 /**
  * Push a new task in the queue.
  * @param type
  * @param time
  */
-void push_event(int type, double time);
+struct event *create_and_insert_event(int type, double time);

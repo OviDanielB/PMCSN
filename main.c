@@ -55,11 +55,18 @@ struct task_t *event_list;
 
 void init_arrival(){
 
-    push_event(EVENT_CLASS_1_ARRIVAL, getArrivalClass1());
-    push_event(EVENT_CLASS_1_ARRIVAL, getArrivalClass1());
-    push_event(EVENT_CLASS_2_ARRIVAL, getArrivalClass2());
+    remove_event(create_and_insert_event(EVENT_CLASS_1_ARRIVAL, getArrivalClass1()));
+    create_and_insert_event(EVENT_CLASS_1_ARRIVAL, getArrivalClass1());
+    create_and_insert_event(EVENT_CLASS_2_ARRIVAL, getArrivalClass2());
+    create_and_insert_event(EVENT_CLASS_2_ARRIVAL, getArrivalClass2());
+    create_and_insert_event(EVENT_CLASS_2_ARRIVAL, getArrivalClass2());
+    create_and_insert_event(EVENT_CLASS_2_ARRIVAL, getArrivalClass2());
+    create_and_insert_event(EVENT_CLASS_2_ARRIVAL, getArrivalClass2());
 
     print_events();
+    printf("length %d\n", get_length());
+
+
 }
 
 
