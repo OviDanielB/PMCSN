@@ -54,13 +54,13 @@
 /**
  * event types
  */
-#define EVENT_CLASS_1_ARRIVAL               0
-#define EVENT_CLASS_1_COMPLETION            1
-#define EVENT_CLASS_1_TO_CLOUD              2
-#define EVENT_CLASS_2_ARRIVAL               3
-#define EVENT_CLASS_2_COMPLETION            4
-#define EVENT_CLASS_2_TO_CLOUD              5
-#define EVENT_CLASS_2_SETUP                 6
+#define EVENT_CLASS_1_ARRIVAL                           0
+#define EVENT_CLASS_1_CLOUDLET_COMPLETION               1
+#define EVENT_CLASS_1_CLOUD_COMPLETION                  2
+#define EVENT_CLASS_2_ARRIVAL                           3
+#define EVENT_CLASS_2_CLOUDLET_COMPLETION               4
+#define EVENT_CLASS_2_CLOUD_COMPLETION                  5
+#define EVENT_CLASS_2_SETUP                             6
 
 /**
  * Batch means parameters

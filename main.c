@@ -56,6 +56,11 @@ int current_batch = 0;                   // batch in execution
 
 void init_arrival() {
 
+    push_event(EVENT_CLASS_1_ARRIVAL, getArrivalClass1());
+    push_event(EVENT_CLASS_1_ARRIVAL, getArrivalClass1());
+    push_event(EVENT_CLASS_2_ARRIVAL, getArrivalClass2());
+
+    print_events();
 }
 
 
