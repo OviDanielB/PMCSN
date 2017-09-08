@@ -66,12 +66,20 @@ void init_arrival() {
 
 int main(int argc, char **argv) {
 
+    if (argc != 5) {
+        fprintf(stderr, "Usage %s <N> <S> <#Batch> <Batch size>\n", argv[0]);
+        exit(EXIT_FAILURE);
+    }
+    N = (int) strtol(argv[1], NULL, 10);
+    S = (int) strtol(argv[2], NULL, 10);
+    batch_number = (int) strtol(argv[3], NULL, 10);
+    batch_time = (int) strtol(argv[4], NULL, 10);
+
     /* plants a seed for the stream generator (automatically generates seed for every stream) */
     PlantSeeds(SEED);
 
     init_arrival();
-    initialize_batch_stat();
-    initialize_end_stat();
+    init_output_stats();
 
     printf("Arrival Time Class 1 : %.2f \n", getArrivalClass1());
     printf("Arrival Time Class 2 : %.2f \n", getArrivalClass2());

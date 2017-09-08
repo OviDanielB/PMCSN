@@ -318,16 +318,3 @@ void push_event(int type, double time) {
         insert_sorted_queue(new);
     }
 }
-
-
-int main() {
-    push_event(1,0.2);
-    printf("HEAD %f TAIL %f\n", head->time, tail->time);
-    push_event(2,0.3);
-    printf("HEAD %f TAIL %f\n", head->time, tail->time);
-    push_event(1,0.1);
-    printf("HEAD %f TAIL %f\n", head->time, tail->time);
-    push_event(1,0.05);
-    printf("HEAD %f TAIL %f\n", head->time, tail->time);
-    print_events();
-}

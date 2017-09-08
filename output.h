@@ -30,9 +30,7 @@ struct End_stat {
 struct Batch_stat *batch_stat;
 struct End_stat *end_stat;
 
-void initialize_batch_stat();
-
-void initialize_end_stat();
+void init_output_stats();
 
 double update_batch_running_mean_response_time(int, double);
 
@@ -40,7 +38,7 @@ double update_batch_running_std_response_time(int, double);
 
 double compute_throughput(int);
 
-double compute_end_response_time_std();
+void compute_end_response_time_stat();
 
 double compute_end_throughput();
 

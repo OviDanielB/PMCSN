@@ -4,7 +4,12 @@
 
 #include "output.h"
 
-void initialize_batch_stat() {
+void init_output_stats() {
+    end_stat = calloc(1, sizeof(struct End_stat));
+    if (end_stat == NULL) {
+        fprintf(stderr, "error in memory allocation\n");
+        exit(EXIT_FAILURE);
+    }
 
     batch_stat = calloc(batch_number, sizeof(struct Batch_stat));
     if (batch_stat == NULL) {
@@ -13,15 +18,6 @@ void initialize_batch_stat() {
     }
 
     t_star = idfStudent(batch_number - 1, 1 - ALPHA / 2);
-}
-
-void initialize_end_stat() {
-
-    end_stat = calloc(1, sizeof(struct End_stat));
-    if (end_stat == NULL) {
-        fprintf(stderr, "error in memory allocation\n");
-        exit(EXIT_FAILURE);
-    }
 }
 
 /*
@@ -104,9 +100,9 @@ double update_batch_running_std_response_time(int current_batch, double value) {
  * Welford's algorithm to compute standard deviation and sample mean on all batches
  * @return statistics on all batch
  */
-double compute_end_response_time_std() {
+void compute_end_response_time_stat() {
 
-    int i, index;
+    int i, index= 0;
     double mean = batch_stat[0].response_time_avg;
     double sum = 0.0;
     double diff;
