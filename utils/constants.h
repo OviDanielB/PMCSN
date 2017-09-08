@@ -51,4 +51,15 @@
 #define INFINITO   (100.0 * STOP)      /* must be much larger than STOP  */
 #define SEED      1234567
 
+/**
+ * event types
+ */
+#define EVENT_CLASS_1_ARRIVAL               0
+#define EVENT_CLASS_1_COMPLETION            1
+#define EVENT_CLASS_1_TO_CLOUD              2
+#define EVENT_CLASS_2_ARRIVAL               3
+#define EVENT_CLASS_2_COMPLETION            4
+#define EVENT_CLASS_2_TO_CLOUD              5
+#define EVENT_CLASS_2_SETUP                 6
+
 
