@@ -55,18 +55,15 @@ struct task_t *event_list;
 
 void init_arrival(){
 
-    push_event(1, 0.2);
-    print_events();
-
 }
 
 
 int main() {
 
-    init_arrival();
-
     /* plants a seed for the stream generator (automatically generates seed for every stream) */
     PlantSeeds(SEED);
+
+    init_arrival();
 
     printf("Arrival Time Class 1 : %.2f \n", getArrivalClass1());
     printf("Arrival Time Class 2 : %.2f \n", getArrivalClass2());
