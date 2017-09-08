@@ -56,18 +56,12 @@ int current_batch = 0;                   // batch in execution
 
 void init_arrival() {
 
-    remove_event(create_and_insert_event(EVENT_CLASS_1_ARRIVAL, getArrivalClass1()));
     create_and_insert_event(EVENT_CLASS_1_ARRIVAL, getArrivalClass1());
     create_and_insert_event(EVENT_CLASS_2_ARRIVAL, getArrivalClass2());
-    create_and_insert_event(EVENT_CLASS_2_ARRIVAL, getArrivalClass2());
-    create_and_insert_event(EVENT_CLASS_2_ARRIVAL, getArrivalClass2());
-    create_and_insert_event(EVENT_CLASS_2_ARRIVAL, getArrivalClass2());
-    create_and_insert_event(EVENT_CLASS_2_ARRIVAL, getArrivalClass2());
+}
 
-    print_events();
-    printf("length %d\n", get_length());
-
-
+int read_int(char **argv,int arg_index){
+    return (int) strtol(argv[arg_index],NULL, 10);
 }
 
 
@@ -78,19 +72,16 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    N = (int) strtol(argv[1], NULL, 10);
-    S = (int) strtol(argv[2], NULL, 10);
-    batch_number = (int) strtol(argv[3], NULL, 10);
-    batch_time = (int) strtol(argv[4], NULL, 10);
+    N = read_int(argv,1);
+    S = read_int(argv,2);
+    batch_number = read_int(argv,3);
+    batch_time = read_int(argv,4);
 
     /* plants a seed for the stream generator (automatically generates seed for every stream) */
     PlantSeeds(SEED);
 
     init_arrival();
     init_output_stats();
-
-    printf("Arrival Time Class 1 : %.2f \n", getArrivalClass1());
-    printf("Arrival Time Class 2 : %.2f \n", getArrivalClass2());
 
     return 0;
 }
