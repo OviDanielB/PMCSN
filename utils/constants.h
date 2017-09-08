@@ -12,6 +12,7 @@
 #include "../rng_lib/rvms.h"
 
 #include "utils.h"
+#include "../task_queue.h"
 
 #ifndef PMCSN_CONSTANTS_H
 #define PMCSN_CONSTANTS_H
@@ -47,7 +48,7 @@
  */
 #define START         0.0              /* initial time                   */
 #define STOP      20000.0              /* terminal (close the door) time */
-#define INFINITY   (100.0 * STOP)      /* must be much larger than STOP  */
+#define INFINITO   (100.0 * STOP)      /* must be much larger than STOP  */
 #define SEED      1234567
 
 

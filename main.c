@@ -50,9 +50,20 @@ struct Time {
     double next;
 } time = {0.0, 0.0};
 
+struct task_t *event_list;
+
+
+void init_arrival(){
+
+    push_event(1, 0.2);
+    print_events();
+
+}
 
 
 int main() {
+
+    init_arrival();
 
     /* plants a seed for the stream generator (automatically generates seed for every stream) */
     PlantSeeds(SEED);

@@ -4,7 +4,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdbool.h>
 #include "task_queue.h"
 
 #define FIFO 1
@@ -13,26 +12,20 @@
 /* task scheduling */
 int policy = 1;
 
-/** Definition of an item of the queue **/
-struct task_t {
-    int class;
-    double time;
-    struct task_t *prev;
-    struct task_t *next;
-};
+
 
 /* first item of the queue */
-struct task_t *head = NULL;
+struct event *head = NULL;
 /* last item of the queue */
-struct task_t *tail = NULL;
+struct event *tail = NULL;
 
-struct task_t *current = NULL;
+struct event *current = NULL;
 
 
 /**
  * Check if the queue is empty.
  */
-bool isEmpty() {
+int isEmpty() {
     return head == NULL;
 }
 
@@ -42,7 +35,7 @@ bool isEmpty() {
  */
 int get_length() {
     int length = 0;
-    struct task_t *current;
+    struct event *current;
 
     for (current = head; current != NULL; current = current->next) {
         length++;
@@ -64,12 +57,12 @@ void set_policy(int p) {
 /**
  * Print all tasks in the queue.
  */
-void print_tasks() {
+void print_events() {
 
-    struct task_t *p = head;
+    struct event *p = head;
     printf("[ ");
     while (p != NULL) {
-        printf("(%d,%f) ",p->class,p->time);
+        printf("(%d,%f) ",p->type,p->time);
         p = p->next;
     }
     printf(" ]\n");
@@ -78,12 +71,12 @@ void print_tasks() {
 /**
  * Print all tasks in the queue in reverse order.
  */
-void print_tasks_reverse() {
+void print_events_reverse() {
 
-    struct task_t *p = tail;
+    struct event *p = tail;
     printf("\n[ ");
     while (p != NULL) {
-        printf("(%d,%f) ",p->class,p->time);
+        printf("(%d,%f) ",p->type,p->time);
         p = p->prev;
     }
     printf(" ]");
@@ -94,10 +87,10 @@ void print_tasks_reverse() {
  *
  * @return allocated task
  */
-struct task_t *alloc_task() {
+struct event *alloc_event() {
 
-    struct task_t *t;
-    t = malloc(sizeof(struct task_t));
+    struct event *t;
+    t = malloc(sizeof(struct event));
     if (t == NULL) {
         fprintf(stderr, "Memory allocation error\n");
         exit(EXIT_FAILURE);
@@ -109,7 +102,7 @@ struct task_t *alloc_task() {
  * Insert a new task at the head of the queue.
  * @param new task
  */
-void insertFirst(struct task_t *new) {
+void insertFirst(struct event *new) {
 
     if (isEmpty()) {
         /* update last task reference */
@@ -128,7 +121,7 @@ void insertFirst(struct task_t *new) {
  * Insert a new task at the end of the queue.
  * @param new task
  */
-void insertLast(struct task_t *new) {
+void insertLast(struct event *new) {
 
     if (isEmpty()) {
         /* update last task reference */
@@ -148,7 +141,7 @@ void insertLast(struct task_t *new) {
  *
  * @param t
  */
-void free_task(struct task_t *t) {
+void free_event(struct event *t) {
     free(t);
 }
 
@@ -156,9 +149,9 @@ void free_task(struct task_t *t) {
  * Remove a task from the queue at the first or at the last position in the queue.
  * @param p
  */
-struct task_t *remove_task(struct task_t *p) {
+struct event *remove_task(struct event *p) {
 
-    struct task_t *tmp = p;
+    struct event *tmp = p;
     if (!isEmpty()) {
         if (p == head) {
             head = head->next;
@@ -168,7 +161,7 @@ struct task_t *remove_task(struct task_t *p) {
             tail = tail->prev;
             tmp->prev->next = tmp->next;
         } else {
-            struct task_t *current = head;
+            struct event *current = head;
             while (current->time != p->time) {
                 if (current->next == NULL) {
                     /* if not found a match */
@@ -191,15 +184,15 @@ struct task_t *remove_task(struct task_t *p) {
  * @param class
  * @return task removed
  */
-struct task_t *remove_last_task_by_class(int class) {
+struct event *remove_last_event_by_type(int type) {
 
-    struct task_t *current = tail;
+    struct event *current = tail;
 
     if (isEmpty()) {
         return NULL;
     }
 
-    while (current->class != class) {
+    while (current->type != type) {
         if (current->prev == NULL) {
             /* if not found a match */
             return NULL;
@@ -228,15 +221,15 @@ struct task_t *remove_last_task_by_class(int class) {
  * @param class
  * @return task removed
  */
-struct task_t *remove_first_task_by_class(int class) {
+struct event *remove_first_event_by_type(int type) {
 
-    struct task_t *current = head;
+    struct event *current = head;
 
     if (isEmpty()) {
         return NULL;
     }
 
-    while (current->class != class) {
+    while (current->type != type) {
         if (current->next == NULL) {
             /* if not found a match */
             return NULL;
@@ -263,7 +256,7 @@ struct task_t *remove_first_task_by_class(int class) {
  * Pop from queue the first task according to the scheduling.
  * @return task
  */
-struct task_t *pop_task() {
+struct event *pop_event() {
     switch (policy) {
         case LIFO:
             return remove_task(tail);
@@ -277,7 +270,7 @@ struct task_t *pop_task() {
  * @param new
  * @param next
  */
-void insert_after_task(struct task_t *new, struct task_t *p) {
+void insert_after_event(struct event *new, struct event *p) {
 
     if (p == NULL) {
         insertFirst(new);
@@ -294,18 +287,18 @@ void insert_after_task(struct task_t *new, struct task_t *p) {
  * Insert a new task sorting by time value.
  * @param new task
  */
-void insert_sorted_queue(struct task_t *new) {
+void insert_sorted_queue(struct event *new) {
 
-    struct task_t *p;
+    struct event *p;
     for (p = tail; p != NULL; p = p->prev) {
         if (p->time > new->time) {
             /* insert new after pnext (before p) */
-            insert_after_task(new, p->prev);
+            insert_after_event(new, p->prev);
             return;
         }
     }
     /* task to insert at the end of the queue */
-    insert_after_task(new, tail);
+    insert_after_event(new, tail);
 }
 
 /**
@@ -313,10 +306,10 @@ void insert_sorted_queue(struct task_t *new) {
  * @param class
  * @param time
  */
-void push_task(int class, double time) {
+void push_event(int type, double time) {
 
-    struct task_t *new = alloc_task();
-    new->class = class;
+    struct event *new = alloc_event();
+    new->type = type;
     new->time = time;
 
     if (isEmpty()) {
