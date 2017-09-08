@@ -77,6 +77,7 @@ int main(int argc, char **argv) {
         fprintf(stderr, "Usage %s <N> <S> <#Batch> <Batch size>\n", argv[0]);
         exit(EXIT_FAILURE);
     }
+
     N = (int) strtol(argv[1], NULL, 10);
     S = (int) strtol(argv[2], NULL, 10);
     batch_number = (int) strtol(argv[3], NULL, 10);
