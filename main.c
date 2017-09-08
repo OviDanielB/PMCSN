@@ -1,6 +1,6 @@
 
-#include "utils/constants.h"
 #include "event_time_generator.h"
+#include "output.h"
 
 
 /**
@@ -34,7 +34,7 @@ struct Area {
  * keeps track of completed tasks
  * useful for calculating throughput
  */
-struct Completed{
+struct Completed {
     long cloudlet_class_1;
     long cloudlet_class_2;
     long cloud_class_1;
@@ -52,18 +52,21 @@ struct Time {
 
 struct task_t *event_list;
 
+int current_batch = 0;                   // batch in execution
 
-void init_arrival(){
+void init_arrival() {
 
 }
 
 
-int main() {
+int main(int argc, char **argv) {
 
     /* plants a seed for the stream generator (automatically generates seed for every stream) */
     PlantSeeds(SEED);
 
     init_arrival();
+    initialize_batch_stat();
+    initialize_end_stat();
 
     printf("Arrival Time Class 1 : %.2f \n", getArrivalClass1());
     printf("Arrival Time Class 2 : %.2f \n", getArrivalClass2());

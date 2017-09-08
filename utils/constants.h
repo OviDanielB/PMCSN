@@ -50,7 +50,7 @@
 #define STOP      20000.0              /* terminal (close the door) time */
 #define INFINITO   (100.0 * STOP)      /* must be much larger than STOP  */
 #define SEED      1234567
-
+#define ALPHA       0.5
 /**
  * event types
  */
@@ -62,4 +62,12 @@
 #define EVENT_CLASS_2_TO_CLOUD              5
 #define EVENT_CLASS_2_SETUP                 6
 
+/**
+ * Batch means parameters
+ */
 
+long batch_number;  // #batches
+double batch_time;  // time dedicated to one batch
+
+int N;              // max jobs in the queue
+int S;              // threshold value

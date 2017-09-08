@@ -4,32 +4,6 @@
 
 #include "output.h"
 
-long batch_number = BATCH_NUMBER;
-int current_batch;                  // batch in execution
-double t_current;                    // current time
-double batch_time;                   // time dedicated to one batch
-
-double t_star = idfStudent(batch_number - 1, 1 - ALPHA / 2);
-
-struct Batch_stat {
-    long completions;               // # job completed
-    double response_time_avg;       // (response_time_sum / completions )
-    double response_time_std;       // standard deviation for E[T]
-    double response_time_sum_sd;    // sum of squared deviations for Welford's algorithm
-
-    double throughput;
-};
-
-struct End_stat {
-    double response_time_avg;
-    double response_time_std;
-
-    double throughput;
-};
-
-struct Batch_stat *batch_stat;
-struct End_stat *end_stat;
-
 void initialize_batch_stat() {
 
     batch_stat = calloc(batch_number, sizeof(struct Batch_stat));
@@ -37,6 +11,8 @@ void initialize_batch_stat() {
         fprintf(stderr, "error in memory allocation\n");
         exit(EXIT_FAILURE);
     }
+
+    t_star = idfStudent(batch_number - 1, 1 - ALPHA / 2);
 }
 
 void initialize_end_stat() {
@@ -62,7 +38,7 @@ void initialize_end_stat() {
  * @return updated mean
  */
 double update_running_mean(double mean, double value, long i) {
-    return mean + ((value - *mean) / i);
+    return mean + ((value - mean) / i);
 }
 
 /**
@@ -100,24 +76,24 @@ double standard_deviation(double *values, double mean, long n) {
 /**
  * Update sample mean with Welford's algorithm
  *
+ * @param current_batch : index of the current batch
  * @param value : new collected value
  * @return sample mean
  */
-double update_batch_running_mean_response_time(double value) {
+double update_batch_running_mean_response_time(int current_batch, double value) {
     return batch_stat[current_batch].response_time_avg = update_running_mean(
-            batch_stat[current_batch].response_time_avg,
-            value, batch_stat[current_batch],
-            batch_stat[current_batch].completitions);
+            batch_stat[current_batch].response_time_avg, value, batch_stat[current_batch].completions);
 }
 
 /**
  * Update running sample squared sum
  *
+ * @param current_batch : index of the current batch
  * @param value : new collected value
  * @return standard deviation
  */
-double update_batch_running_std_response_time(double value) {
-    struct Batch_stat curr = batch_stat[current];
+double update_batch_running_std_response_time(int current_batch, double value) {
+    struct Batch_stat curr = batch_stat[current_batch];
     curr.response_time_sum_sd = update_running_sample_sum_sd(curr.response_time_sum_sd, curr.response_time_avg, value,
                                                              curr.completions);
     return sqrt(curr.response_time_sum_sd / curr.completions);
@@ -130,7 +106,7 @@ double update_batch_running_std_response_time(double value) {
  */
 double compute_end_response_time_std() {
 
-    int i;
+    int i, index;
     double mean = batch_stat[0].response_time_avg;
     double sum = 0.0;
     double diff;
@@ -152,9 +128,11 @@ double compute_end_response_time_std() {
 
 /**
  * Throughput for the current batch
+ * @param current_batch : index of the batch in execution
+ *
  * @return current throughput
  */
-double compute_throughput() {
+double compute_throughput(int current_batch) {
     return batch_stat[current_batch].completions / (batch_time * (current_batch + 1));
 }
 
@@ -172,7 +150,7 @@ double compute_end_throughput() {
         completions += curr.completions;
     }
 
-    return completions / t_current;
+    return completions / (batch_number * batch_time);
 }
 
 /**
@@ -182,7 +160,7 @@ double compute_end_throughput() {
  * @param n : # element in the sample
  * @return endpoint for confidence interval
  */
-double estimate_interval_endpoint(double sample_mean, double s) {
+double estimate_interval_endpoint(double s) {
     return (t_star * s) / sqrt(batch_number - 1);
 }
 
