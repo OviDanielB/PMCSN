@@ -12,7 +12,7 @@
 #include "../rng_lib/rvms.h"
 
 #include "utils.h"
-#include "../task_queue.h"
+#include "../event_queue.h"
 
 #ifndef PMCSN_CONSTANTS_H
 #define PMCSN_CONSTANTS_H
@@ -62,10 +62,16 @@
 #define EVENT_CLASS_2_CLOUD_COMPLETION                  5
 #define EVENT_CLASS_2_SETUP                             6
 
+
+#define ACCEPT_CLASS_1_ON_CLOUDLET                      0
+#define SEND_CLASS_1_TO_CLOUD                           1
+#define INTERRUPT_CLASS_2_ON_CLOUDLET_AND_SEND_TO_CLOUD 2
+#define ACCEPT_CLASS_2_ON_CLOUDLET                      3
+#define SEND_CLASS_2_TO_CLOUD                           4
+
 /**
  * Batch means parameters
  */
-
 long batch_number;  // #batches
 double batch_time;  // time dedicated to one batch
 

@@ -4,7 +4,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "task_queue.h"
+#include "event_queue.h"
 
 #define FIFO 1
 #define LIFO 2
@@ -199,6 +199,7 @@ struct event *create_and_insert_event(int type, double time) {
     struct event *event = alloc_event();
     event->time = time;
     event->type = type;
+    event->job_size = -1; // default value
 
     if(head != NULL)
     {

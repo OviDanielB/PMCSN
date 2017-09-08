@@ -10,6 +10,7 @@ struct event {
     double time;
     struct event *prev;
     struct event *next;
+    double job_size;
 };
 
 /**
