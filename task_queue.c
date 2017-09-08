@@ -312,9 +312,13 @@ void push_event(int type, double time) {
     new->type = type;
     new->time = time;
 
+
     if (isEmpty()) {
         insertFirst(new);
     } else {
         insert_sorted_queue(new);
     }
+
+    printf("head: %f\n", head->time);
+    printf("tail: %f\n", tail->time);
 }
