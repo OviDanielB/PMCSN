@@ -1,4 +1,5 @@
 
+#include <errno.h>
 #include "event_time_generator.h"
 #include "output.h"
 
@@ -53,6 +54,8 @@ struct Time {
 struct task_t *event_list;
 
 int current_batch = 0;                   // batch in execution
+double time_end;
+
 
 void init_arrival() {
 
@@ -63,23 +66,49 @@ void init_arrival() {
     print_events();
 }
 
-
-int main(int argc, char **argv) {
+void init_params(int argc, char **argv) {
 
     if (argc != 5) {
         fprintf(stderr, "Usage %s <N> <S> <#Batch> <Batch size>\n", argv[0]);
         exit(EXIT_FAILURE);
     }
+
+    errno = 0;
     N = (int) strtol(argv[1], NULL, 10);
     S = (int) strtol(argv[2], NULL, 10);
     batch_number = (int) strtol(argv[3], NULL, 10);
     batch_time = (int) strtol(argv[4], NULL, 10);
+    if (errno != 0) {
+        fprintf(stderr, "Usage %s <N> <S> <#Batch> <Batch size>\n", argv[0]);
+        exit(EXIT_FAILURE);
+    }
 
+}
+
+void process_event(struct event *ev) {
+
+}
+
+long jobs_left() {
+    return state.cldlet_1 + state.cldlet_2 + state.cloud_1 + state.cloud_2 + state.setup_2;
+}
+
+int main(int argc, char **argv) {
+
+    int i;
+    time_end = (batch_number + 1) * batch_time;
+
+    init_params(argc, argv);
     /* plants a seed for the stream generator (automatically generates seed for every stream) */
     PlantSeeds(SEED);
-
     init_arrival();
     init_output_stats();
+
+    for (i = 0; i < batch_number; i++) {
+        while (time.current < time_end || jobs_left() != 0) {
+            process_event(pop_event());
+        }
+    }
 
     printf("Arrival Time Class 1 : %.2f \n", getArrivalClass1());
     printf("Arrival Time Class 2 : %.2f \n", getArrivalClass2());
