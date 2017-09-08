@@ -59,11 +59,12 @@ double time_end;
 
 void init_arrival() {
 
-    push_event(EVENT_CLASS_1_ARRIVAL, getArrivalClass1());
-    push_event(EVENT_CLASS_1_ARRIVAL, getArrivalClass1());
-    push_event(EVENT_CLASS_2_ARRIVAL, getArrivalClass2());
+    create_and_insert_event(EVENT_CLASS_1_ARRIVAL, getArrivalClass1());
+    create_and_insert_event(EVENT_CLASS_2_ARRIVAL, getArrivalClass2());
+}
 
-    print_events();
+int read_int(char **argv,int arg_index){
+    return (int) strtol(argv[arg_index],NULL, 10);
 }
 
 void init_params(int argc, char **argv) {
@@ -74,10 +75,10 @@ void init_params(int argc, char **argv) {
     }
 
     errno = 0;
-    N = (int) strtol(argv[1], NULL, 10);
-    S = (int) strtol(argv[2], NULL, 10);
-    batch_number = (int) strtol(argv[3], NULL, 10);
-    batch_time = (int) strtol(argv[4], NULL, 10);
+    N = read_int(argv,1);
+    S = read_int(argv,2);
+    batch_number = read_int(argv,3);
+    batch_time = read_int(argv,4);
     if (errno != 0) {
         fprintf(stderr, "Usage %s <N> <S> <#Batch> <Batch size>\n", argv[0]);
         exit(EXIT_FAILURE);

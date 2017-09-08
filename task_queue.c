@@ -19,15 +19,11 @@ struct event *head = NULL;
 /* last item of the queue */
 struct event *tail = NULL;
 
-struct event *current = NULL;
 
-
-/**
- * Check if the queue is empty.
- */
-int isEmpty() {
+int isEmpty(){
     return head == NULL;
 }
+
 
 /**
  * Get the number of the tasks in the queue
@@ -59,13 +55,14 @@ void set_policy(int p) {
  */
 void print_events() {
 
-    struct event *p = head;
-    printf("[");
-    while (p != NULL) {
-        printf(" (%d,%f)",p->type,p->time);
-        p = p->next;
+    if(head != NULL){
+        struct event * actual = head;
+        while(actual != NULL){
+            printf(" %f:%d,",actual->time,actual->type);
+            actual = actual->next;
+        }
+        printf("\n");
     }
-    printf(" ]\n");
 }
 
 /**
@@ -98,43 +95,6 @@ struct event *alloc_event() {
     return t;
 }
 
-/**
- * Insert a new task at the head of the queue.
- * @param new task
- */
-void insert_first(struct event *new) {
-
-    if (isEmpty()) {
-        /* update last task reference */
-        tail = new;
-    } else {
-        /* update first prev task*/
-        head->prev = new;
-        /* point it to old first task */
-        new->next = head;
-    }
-    /* point first to new first task */
-    head = new;
-}
-
-/**
- * Insert a new task at the end of the queue.
- * @param new task
- */
-void insert_last(struct event *new) {
-
-    if (isEmpty()) {
-        /* update last task reference */
-        head = new;
-    } else {
-        /* make task a new last task */
-        tail->next = new;
-        /* mark old last node as prev of new task */
-        new->prev = tail;
-    }
-    /* point last to new last task */
-    tail = new;
-}
 
 /**
  * Deallocation of an element in the queue
@@ -149,33 +109,30 @@ void free_event(struct event *t) {
  * Remove a task from the queue at the first or at the last position in the queue.
  * @param p
  */
-struct event *remove_task(struct event *p) {
+struct event *remove_event(struct event *event) {
 
-    struct event *tmp = p;
-    if (!isEmpty()) {
-        if (p == head) {
-            head = head->next;
-            tmp->next->prev = tmp->prev;
-        }
-        else if (p == tail) {
-            tail = tail->prev;
-            tmp->prev->next = tmp->next;
-        } else {
-            struct event *current = head;
-            while (current->time != p->time) {
-                if (current->next == NULL) {
-                    /* if not found a match */
-                    return NULL;
-                } else
-                    current = current->next;
-            }
-            /* found a match */
-            current->prev->next = current->next;
-            current->next->prev = current->prev;
-            return current;
-        }
+    if(event == NULL){
+        return NULL;
     }
-    return p;
+    struct event * after = event->next;
+    struct event * before = event->prev;
+
+    if(before != NULL){
+        before->next = before->next->next;
+    }
+    else{
+        head = after;
+    }
+
+    if(after != NULL){
+        after->prev = after->prev->prev;
+    }
+    else{
+        tail = before;
+    }
+    event->next = NULL;
+    event->prev = NULL;
+    return event;
 }
 
 /**
@@ -186,33 +143,7 @@ struct event *remove_task(struct event *p) {
  */
 struct event *remove_last_event_by_type(int type) {
 
-    struct event *current = tail;
-
-    if (isEmpty()) {
-        return NULL;
-    }
-
-    while (current->type != type) {
-        if (current->prev == NULL) {
-            /* if not found a match */
-            return NULL;
-        } else
-            current = current->prev;
-    }
-    /* if found a match */
-
-    if (current == head) {
-        head = head->next;
-    } else {
-        current->prev->next = current->next;
-    }
-
-    if (current == tail) {
-        tail = current->prev;
-    } else {
-        current->next->prev = current->prev;
-    }
-    return current;
+        // TODO
 }
 
 /**
@@ -223,33 +154,7 @@ struct event *remove_last_event_by_type(int type) {
  */
 struct event *remove_first_event_by_type(int type) {
 
-    struct event *current = head;
-
-    if (isEmpty()) {
-        return NULL;
-    }
-
-    while (current->type != type) {
-        if (current->next == NULL) {
-            /* if not found a match */
-            return NULL;
-        } else
-            current = current->next;
-    }
-    /* if found a match */
-
-    if (current == head) {
-        head = head->next;
-    } else {
-        current->prev->next = current->next;
-    }
-
-    if (current == tail) {
-        tail = current->prev;
-    } else {
-        current->next->prev = current->prev;
-    }
-    return current;
+    // TODO
 }
 
 /**
@@ -257,64 +162,89 @@ struct event *remove_first_event_by_type(int type) {
  * @return task
  */
 struct event *pop_event() {
-    switch (policy) {
-        case LIFO:
-            return remove_task(tail);
-        default: // FIFO
-            return remove_task(head);
+    if(head == NULL){
+        return NULL;
     }
+    if(head->next == NULL){
+        struct event * event = head;
+        head = NULL;
+        tail = NULL;
+        return event;
+    }
+
+    struct event * first = head;
+    head = head->next;
+    head->prev = NULL;
+
+    first->prev = NULL;
+    first->next = NULL;
+
+
+    return first;
 }
 
-/**
- * Push a new task as the last item in the queue
- * @param new
- * @param next
- */
-void insert_after_event(struct event *new, struct event *p) {
 
-    if (p == NULL) {
-        insert_first(new);
-    } else if (p == tail) {
-        insert_last(new);
-    } else {
-        new->prev = p;
-        new->next = p->next;
-        p->next = new;
-    }
-}
+
 
 /**
- * Insert a new task sorting by time value.
- * @param new task
- */
-void insert_sorted_queue(struct event *new) {
-
-    struct event *p;
-    for (p = head; p != NULL; p = p->next) {
-        if (p->time > new->time) {
-            /* insert new after pnext (before p) */
-            insert_after_event(new, p->prev);
-            return;
-        }
-    }
-    /* task to insert at the end of the queue */
-    insert_after_event(new, tail);
-}
-
-/**
- * Push a new task in the queue.
- * @param class
+ * Create a new task and push it in the queue.
+ * @param type event
  * @param time
  */
-void push_event(int type, double time) {
+struct event *create_and_insert_event(int type, double time) {
 
-    struct event *new = alloc_event();
-    new->type = type;
-    new->time = time;
+    int inserted = 0;
 
-    if (isEmpty()) {
-        insert_first(new);
-    } else {
-        insert_sorted_queue(new);
+    /* allocate new event struct */
+    struct event *event = alloc_event();
+    event->time = time;
+    event->type = type;
+
+    if(head != NULL)
+    {
+        if(event->time < head->time)
+        {
+            event->next = head;
+            event->next->prev = event;
+            event->prev = NULL;
+            head = event;
+            inserted = 1;
+        }
+
+        struct event * prev = head;
+        struct event * current = head->next;
+        
+        while(current != NULL && inserted == 0)
+        {
+            if(event->time < current->time)
+            {
+                prev->next = event;
+                event->prev = prev;
+                event->next = current;
+                event->next->prev = event;
+                inserted = 1;
+            }
+            prev = prev->next;
+            current = current->next;
+        }
+
+        if(inserted == 0)  // append to list after last one
+        {
+            prev->next = event;
+            event->next = NULL;
+            event->prev = prev;
+            tail = event;
+            inserted = 1;
+        }
     }
+
+    else
+    {
+        head = event;
+        head->next = NULL;
+        head->prev = NULL;
+        tail = event;
+    }
+    return event;
 }
+
