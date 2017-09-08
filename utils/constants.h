@@ -49,3 +49,5 @@
 #define STOP      20000.0              /* terminal (close the door) time */
 #define INFINITY   (100.0 * STOP)      /* must be much larger than STOP  */
 #define SEED      1234567
+
+
