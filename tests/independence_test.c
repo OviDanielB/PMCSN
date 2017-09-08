@@ -2,8 +2,7 @@
 // Created by Ovidiu Daniel Barba on 30/08/2017.
 //
 
-#include <stdio.h>
-#include "../empirical_test_randomness.h"
+#include "../randomness_test/empirical_test_randomness.h"
 
 
 int main(int argc, char **argv){

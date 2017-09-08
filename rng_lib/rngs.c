@@ -37,7 +37,7 @@
 #include "rngs.h"
 
 /* MULTIPLIER WAS CHANGED TO TEST NEW ONE */
-#define MULTIPLIER 25697   //48271      /* DON'T CHANGE THIS VALUE                  */
+#define MULTIPLIER 25697 //48271      /* DON'T CHANGE THIS VALUE                  */
 #define MODULUS    2147483647 /* DON'T CHANGE THIS VALUE                  */
 #define CHECK      399268537  /* DON'T CHANGE THIS VALUE                  */
 #define STREAMS    256        /* # of streams, DON'T CHANGE THIS VALUE    */
@@ -51,7 +51,7 @@ static int  initialized   = 0;          /* test for stream initialization */
 
    double Random(void)
 /* ----------------------------------------------------------------
- * Random returns a pseudo-random real number uniformly distributed 
+ * Random returns a pseudo-random real number uniformly distributed
  * between 0.0 and 1.0. 
  * ----------------------------------------------------------------
  */
