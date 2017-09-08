@@ -60,9 +60,9 @@ void set_policy(int p) {
 void print_events() {
 
     struct event *p = head;
-    printf("[ ");
+    printf("[");
     while (p != NULL) {
-        printf("(%d,%f) ",p->type,p->time);
+        printf(" (%d,%f)",p->type,p->time);
         p = p->next;
     }
     printf(" ]\n");
@@ -102,7 +102,7 @@ struct event *alloc_event() {
  * Insert a new task at the head of the queue.
  * @param new task
  */
-void insertFirst(struct event *new) {
+void insert_first(struct event *new) {
 
     if (isEmpty()) {
         /* update last task reference */
@@ -110,9 +110,9 @@ void insertFirst(struct event *new) {
     } else {
         /* update first prev task*/
         head->prev = new;
+        /* point it to old first task */
+        new->next = head;
     }
-    /* point it to old first task */
-    new->next = head;
     /* point first to new first task */
     head = new;
 }
@@ -121,11 +121,11 @@ void insertFirst(struct event *new) {
  * Insert a new task at the end of the queue.
  * @param new task
  */
-void insertLast(struct event *new) {
+void insert_last(struct event *new) {
 
     if (isEmpty()) {
         /* update last task reference */
-        tail = new;
+        head = new;
     } else {
         /* make task a new last task */
         tail->next = new;
@@ -273,9 +273,9 @@ struct event *pop_event() {
 void insert_after_event(struct event *new, struct event *p) {
 
     if (p == NULL) {
-        insertFirst(new);
+        insert_first(new);
     } else if (p == tail) {
-        insertLast(new);
+        insert_last(new);
     } else {
         new->prev = p;
         new->next = p->next;
@@ -290,7 +290,7 @@ void insert_after_event(struct event *new, struct event *p) {
 void insert_sorted_queue(struct event *new) {
 
     struct event *p;
-    for (p = tail; p != NULL; p = p->prev) {
+    for (p = head; p != NULL; p = p->next) {
         if (p->time > new->time) {
             /* insert new after pnext (before p) */
             insert_after_event(new, p->prev);
@@ -313,8 +313,21 @@ void push_event(int type, double time) {
     new->time = time;
 
     if (isEmpty()) {
-        insertFirst(new);
+        insert_first(new);
     } else {
         insert_sorted_queue(new);
     }
+}
+
+
+int main() {
+    push_event(1,0.2);
+    printf("HEAD %f TAIL %f\n", head->time, tail->time);
+    push_event(2,0.3);
+    printf("HEAD %f TAIL %f\n", head->time, tail->time);
+    push_event(1,0.1);
+    printf("HEAD %f TAIL %f\n", head->time, tail->time);
+    push_event(1,0.05);
+    printf("HEAD %f TAIL %f\n", head->time, tail->time);
+    print_events();
 }
