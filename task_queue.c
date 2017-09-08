@@ -11,19 +11,18 @@
 
 /* task scheduling */
 int policy = 1;
-
-
-
 /* first item of the queue */
 struct event *head = NULL;
 /* last item of the queue */
 struct event *tail = NULL;
 
-
-int isEmpty(){
+/**
+ * Check if the event list is empty
+ * @return boolean
+ */
+int is_empty() {
     return head == NULL;
 }
-
 
 /**
  * Get the number of the tasks in the queue
@@ -44,6 +43,7 @@ int get_length() {
  * @param p 1 for FIFO, 2 for LIFO
  */
 void set_policy(int p) {
+
     if (p == FIFO || p == LIFO)
         policy = p;
     else
@@ -55,13 +55,14 @@ void set_policy(int p) {
  */
 void print_events() {
 
-    if(head != NULL){
-        struct event * actual = head;
-        while(actual != NULL){
-            printf(" %f:%d,",actual->time,actual->type);
-            actual = actual->next;
+    if (!is_empty()) {
+        struct event *p = head;
+        printf("[ ");
+        while(p != NULL){
+            printf("(%f:%d) ",p->time, p->type);
+            p = p->next;
         }
-        printf("\n");
+        printf("}\n");
     }
 }
 
@@ -70,13 +71,15 @@ void print_events() {
  */
 void print_events_reverse() {
 
-    struct event *p = tail;
-    printf("\n[ ");
-    while (p != NULL) {
-        printf("(%d,%f) ",p->type,p->time);
-        p = p->prev;
+    if (!is_empty()) {
+        struct event *p = tail;
+        printf("[ ");
+        while (p != NULL) {
+            printf("(%f:%d) ", p->time, p->type);
+            p = p->prev;
+        }
+        printf("]\n");
     }
-    printf(" ]");
 }
 
 /**
@@ -95,7 +98,6 @@ struct event *alloc_event() {
     return t;
 }
 
-
 /**
  * Deallocation of an element in the queue
  *
@@ -111,7 +113,7 @@ void free_event(struct event *t) {
  */
 struct event *remove_event(struct event *event) {
 
-    if(event == NULL){
+    if (event == NULL){
         return NULL;
     }
     struct event * after = event->next;
@@ -143,7 +145,33 @@ struct event *remove_event(struct event *event) {
  */
 struct event *remove_last_event_by_type(int type) {
 
-        // TODO
+    struct event *current = tail;
+
+    if (is_empty()) {
+        return NULL;
+    }
+
+    while (current->type != type) {
+        if (current->prev == NULL) {
+            /* if not found a match */
+            return NULL;
+        } else
+            current = current->prev;
+    }
+    /* if found a match */
+
+    if (current == head) {
+        head = head->next;
+    } else {
+        current->prev->next = current->next;
+    }
+
+    if (current == tail) {
+        tail = current->prev;
+    } else {
+        current->next->prev = current->prev;
+    }
+    return current;
 }
 
 /**
@@ -154,15 +182,40 @@ struct event *remove_last_event_by_type(int type) {
  */
 struct event *remove_first_event_by_type(int type) {
 
-    // TODO
-}
+    struct event *current = head;
+
+    if (is_empty()) {
+        return NULL;
+    }
+
+    while (current->type != type) {
+        if (current->next == NULL) {
+            /* if not found a match */
+            return NULL;
+        } else
+            current = current->next;
+    }
+    /* if found a match */
+
+    if (current == head) {
+        head = head->next;
+    } else {
+        current->prev->next = current->next;
+    }
+
+    if (current == tail) {
+        tail = current->prev;
+    } else {
+        current->next->prev = current->prev;
+    }
+    return current;}
 
 /**
  * Pop from queue the first task according to the scheduling.
  * @return task
  */
 struct event *pop_event() {
-    if(head == NULL){
+    if(is_empty()){
         return NULL;
     }
     if(head->next == NULL){
@@ -179,12 +232,8 @@ struct event *pop_event() {
     first->prev = NULL;
     first->next = NULL;
 
-
     return first;
 }
-
-
-
 
 /**
  * Create a new task and push it in the queue.
@@ -194,16 +243,13 @@ struct event *pop_event() {
 struct event *create_and_insert_event(int type, double time) {
 
     int inserted = 0;
-
     /* allocate new event struct */
     struct event *event = alloc_event();
     event->time = time;
     event->type = type;
 
-    if(head != NULL)
-    {
-        if(event->time < head->time)
-        {
+    if (!is_empty()) {
+        if (event->time < head->time) {
             event->next = head;
             event->next->prev = event;
             event->prev = NULL;
@@ -214,10 +260,8 @@ struct event *create_and_insert_event(int type, double time) {
         struct event * prev = head;
         struct event * current = head->next;
         
-        while(current != NULL && inserted == 0)
-        {
-            if(event->time < current->time)
-            {
+        while (current != NULL && inserted == 0) {
+            if (event->time < current->time) {
                 prev->next = event;
                 event->prev = prev;
                 event->next = current;
@@ -228,18 +272,14 @@ struct event *create_and_insert_event(int type, double time) {
             current = current->next;
         }
 
-        if(inserted == 0)  // append to list after last one
-        {
+        if (inserted == 0) { // append to list after last one
             prev->next = event;
             event->next = NULL;
             event->prev = prev;
             tail = event;
             inserted = 1;
         }
-    }
-
-    else
-    {
+    } else {
         head = event;
         head->next = NULL;
         head->prev = NULL;

@@ -15,7 +15,7 @@ struct event {
 /**
  * Check if the queue is empty.
  */
-int isEmpty();
+int is_empty();
 /**
  * Get the number of the tasks in the queue
  * @return int number
