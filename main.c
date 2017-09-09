@@ -1,14 +1,13 @@
-
 #include <errno.h>
 #include "event_time_generator.h"
 #include "output.h"
 
 
 /**
- * represents the number of tasks
+ * Represents the number of tasks
  * in each part of the system
  */
-struct State {
+struct {
     long cldlet_1;
     long cldlet_2;
     long cloud_1;
@@ -16,48 +15,17 @@ struct State {
     long setup_2;
 } state = {0, 0, 0, 0, 0};
 
-
 /**
- * statistics gathering structure to calculate
- * time-averaged numbers
+ * Keeps track of simulation time
  */
-struct Area {
-    double node;
-    double cloudlet_node;
-    double cloud_node;
-    double service;
-    double cloudlet_service;
-    double cloud_service;
-} area = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-
-
-/**
- * keeps track of completed tasks
- * useful for calculating throughput
- */
-struct Completed {
-    long cloudlet_class_1;
-    long cloudlet_class_2;
-    long cloud_class_1;
-    long cloud_class_2;
-} completed = {0, 0, 0, 0};
-
-
-/**
- * keeps track of simulation time
- */
-struct Time {
+struct {
     double current;
     double next;
 } time = {0.0, 0.0};
 
-struct task_t *event_list;
-
 int current_batch = 0;                   // batch in execution
 double batch_end;
-
 double simulation_end;
-
 
 /**
  * initialize first arrival time events
@@ -74,8 +42,16 @@ void init_arrival() {
  * @param arg_index
  * @return integer
  */
-int read_int(char **argv,int arg_index){
-    return (int) strtol(argv[arg_index],NULL, 10);
+int read_int(char **argv, int arg_index) {
+
+    errno = 0;
+    int v = (int) strtol(argv[arg_index], NULL, 10);
+    if (errno != 0) {
+        fprintf(stderr, "Usage %s <N> <S> <#Batch> <Batch size>\n", argv[0]);
+        exit(EXIT_FAILURE);
+    }
+
+    return v;
 }
 
 void init_params(int argc, char **argv) {
@@ -85,23 +61,27 @@ void init_params(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    errno = 0;
-    N = read_int(argv,1);
-    S = read_int(argv,2);
-    batch_number = read_int(argv,3);
-    batch_time = read_int(argv,4);
+    N = read_int(argv, 1);
+    S = read_int(argv, 2);
+    batch_number = read_int(argv, 3);
+    batch_time = read_int(argv, 4);
 
     simulation_end = (batch_number) * batch_time;
-    if (errno != 0) {
-        fprintf(stderr, "Usage %s <N> <S> <#Batch> <Batch size>\n", argv[0]);
-        exit(EXIT_FAILURE);
-    }
 
+
+}
+
+/**
+ * get number of jobs still processing
+ */
+long jobs_left() {
+    return state.cldlet_1 + state.cldlet_2 + state.cloud_1 + state.cloud_2 + state.setup_2;
 }
 
 int is_arrival(struct event *pEvent) {
 
-    return pEvent->type == EVENT_CLASS_1_ARRIVAL || pEvent->type == EVENT_CLASS_2_ARRIVAL || pEvent->type == EVENT_CLASS_2_SETUP;
+    return pEvent->type == EVENT_CLASS_1_ARRIVAL || pEvent->type == EVENT_CLASS_2_ARRIVAL ||
+           pEvent->type == EVENT_CLASS_2_SETUP;
 
 }
 
@@ -112,15 +92,15 @@ int is_arrival(struct event *pEvent) {
  * @return action
  */
 int dispatch(struct event *event) {
-    switch(event->type){
+    switch (event->type) {
         case EVENT_CLASS_1_ARRIVAL:
-            if(state.cldlet_1 == N){
+            if (state.cldlet_1 == N) {
                 return SEND_CLASS_1_TO_CLOUD;
             } else {
-                if(state.cldlet_1 + state.cldlet_2 < S){
+                if (state.cldlet_1 + state.cldlet_2 < S) {
                     return ACCEPT_CLASS_1_ON_CLOUDLET;
                 } else {
-                    if (state.cldlet_2 > 0 )
+                    if (state.cldlet_2 > 0)
                         return INTERRUPT_CLASS_2_ON_CLOUDLET_AND_SEND_TO_CLOUD;
                     else
                         return ACCEPT_CLASS_1_ON_CLOUDLET;
@@ -129,23 +109,23 @@ int dispatch(struct event *event) {
             }
 
         case EVENT_CLASS_2_ARRIVAL:
-            if(state.cldlet_1 + state.cldlet_2 >= S)
+            if (state.cldlet_1 + state.cldlet_2 >= S)
                 return SEND_CLASS_2_TO_CLOUD;
             else
                 return ACCEPT_CLASS_2_ON_CLOUDLET;
         default:
-            fprintf(stderr,"Event type should be an arrival!\n");
+            fprintf(stderr, "Event type should be an arrival!\n");
             exit(EXIT_FAILURE);
 
     }
 }
 
-void next_arrival(int class_event){
+void next_arrival(int class_event) {
 
-    if(time.current >= simulation_end){
+    if (time.current >= simulation_end) {
         return;
     }
-    switch(class_event) {
+    switch (class_event) {
         case EVENT_CLASS_1_ARRIVAL:
             create_and_insert_event(EVENT_CLASS_1_ARRIVAL, getArrivalClass1());
             break;
@@ -153,15 +133,26 @@ void next_arrival(int class_event){
             create_and_insert_event(EVENT_CLASS_2_ARRIVAL, getArrivalClass2());
             break;
         default:
-            fprintf(stderr,"Not an arrival\n");
+            fprintf(stderr, "Not an arrival\n");
     }
+}
+
+void update_node_area() {
+
+    double interval = time.next - time.current;
+    area[current_batch].node += interval * (jobs_left());
+    area[current_batch].cloud_node += interval * (state.cloud_1 + state.cloud_2);
+    area[current_batch].cloudlet_node += interval * (state.cldlet_1 + state.cldlet_2);
+
 }
 
 void execute_arrival(struct event *arrival_event, int action) {
 
-    time.current = arrival_event->time;
+    time.next = arrival_event->time;
+    update_node_area();
+    time.current = time.next;
 
-    switch(action){
+    switch (action) {
         case SEND_CLASS_1_TO_CLOUD:
             state.cloud_1++;
 
@@ -180,16 +171,26 @@ void execute_arrival(struct event *arrival_event, int action) {
             state.cldlet_1++;
             state.cldlet_2--;
             state.cloud_2++;
+            completed->interrupted_class_2++;
 
+            /* compute remaining service time for job of class 2 to interrupt */
             struct event *class_2_event_cloudlet = remove_first_event_by_type(EVENT_CLASS_2_CLOUDLET_COMPLETION);
             double remaining_time = class_2_event_cloudlet->time - time.current;
             double job_remaining_percentage = remaining_time / class_2_event_cloudlet->job_size;
 
+            /* update service time spent for interrupted jobs */
+            double wasted_time = time.current - (class_2_event_cloudlet->time - class_2_event_cloudlet->job_size);
+            service->cloudlet_class_2_interrupted += wasted_time;
 
+            /* compute new service time for interrupted job in the cloud */
             double class_2_cloud_service_time = getServiceClass2Cloud();
-            double class_2_cloud_remaining_time = class_2_cloud_service_time * job_remaining_percentage ;
+            double class_2_cloud_remaining_time = class_2_cloud_service_time * job_remaining_percentage;
+            double service_time = class_2_cloud_remaining_time + getSetup();
+            service->cloud_class_2_interrupted += service_time;
+            create_and_insert_event(EVENT_CLASS_2_CLOUD_COMPLETION, time.current + service_time);
 
-            create_and_insert_event(EVENT_CLASS_2_CLOUD_COMPLETION, time.current + class_2_cloud_remaining_time + getSetup());
+            /*For the job just entered that caused the class 2 job's interruption */
+            create_and_insert_event(EVENT_CLASS_1_CLOUDLET_COMPLETION, time.current + getServiceClass1Cloudlet());
 
             break;
         case SEND_CLASS_2_TO_CLOUD:
@@ -202,15 +203,15 @@ void execute_arrival(struct event *arrival_event, int action) {
         case ACCEPT_CLASS_2_ON_CLOUDLET:
             state.cldlet_2++;
 
-            struct event *cl_2_event = create_and_insert_event(EVENT_CLASS_2_CLOUDLET_COMPLETION, time.current + getServiceClass2Cloudlet());
+            struct event *cl_2_event = create_and_insert_event(EVENT_CLASS_2_CLOUDLET_COMPLETION,
+                                                               time.current + getServiceClass2Cloudlet());
             cl_2_event->job_size = cl_2_event->time - arrival_event->time;
 
             next_arrival(EVENT_CLASS_2_ARRIVAL);
             break;
         default:
-            fprintf(stderr,"No action matching!\n");
+            fprintf(stderr, "No action matching!\n");
     }
-
 
 
 }
@@ -222,26 +223,26 @@ void execute_completion(struct event *event) {
     switch (event->type) {
         case EVENT_CLASS_1_CLOUDLET_COMPLETION:
             state.cldlet_1--;
-            completed.cloudlet_class_1++;
-            // TODO
+            completed[current_batch].cloudlet_class_1++;
+            service[current_batch].cloudlet_class_1 += event->job_size;
 
             break;
         case EVENT_CLASS_2_CLOUDLET_COMPLETION:
             state.cldlet_2--;
-            completed.cloudlet_class_2++;
-            // TODO
+            completed[current_batch].cloudlet_class_2++;
+            service[current_batch].cloudlet_class_2 += event->job_size;
 
             break;
         case EVENT_CLASS_1_CLOUD_COMPLETION:
             state.cloud_1--;
-            completed.cloud_class_1++;
-            // TODO
+            completed[current_batch].cloud_class_1++;
+            service[current_batch].cloud_class_1 += event->job_size;
 
             break;
         case EVENT_CLASS_2_CLOUD_COMPLETION:
             state.cloud_2--;
-            completed.cloud_class_2++;
-            // TODO
+            completed[current_batch].cloud_class_2++;
+            service[current_batch].cloud_class_2 += event->job_size;
 
             break;
         default:
@@ -249,10 +250,10 @@ void execute_completion(struct event *event) {
     }
 }
 
-void process_event(struct event * event) {
+void process_event(struct event *event) {
 
     int dispatch_action;
-    if(is_arrival(event)){
+    if (is_arrival(event)) {
         dispatch_action = dispatch(event);
         execute_arrival(event, dispatch_action);
     } else { /* completion */
@@ -260,15 +261,7 @@ void process_event(struct event * event) {
     }
 }
 
-/**
- * get number of jobs still processing
- */
-long jobs_left() {
-    return state.cldlet_1 + state.cldlet_2 + state.cloud_1 + state.cloud_2 + state.setup_2;
-}
-
 int main(int argc, char **argv) {
-
 
 
     init_params(argc, argv);
@@ -278,14 +271,23 @@ int main(int argc, char **argv) {
     init_output_stats();
 
 
-
     for (current_batch = 0; current_batch < batch_number; current_batch++) {
         batch_end = (current_batch + 1) * batch_time;
-        while (time.current < batch_end || (current_batch == batch_number -1 && jobs_left() != 0) ) {
+        while (time.current < batch_end || (current_batch == batch_number - 1 && jobs_left() != 0)) {
             process_event(pop_event());
         }
 
+        /* Warning: The denominator must be time.current and NOT batch_end for computation correctness*/
+        batch_stat[current_batch].avg_node = area->node / time.current;
+        batch_stat[current_batch].avg_node_cloudlet = area->cloudlet_node / time.current;
+        batch_stat[current_batch].avg_node_cloud = area->cloud_node / time.current;
+
+        //TODO compute probabilities
     }
+
+    //TODO compute mean and std of batch means
+    //TODO compute throughput
+
 
     return 0;
 }

@@ -1,7 +1,3 @@
-//
-// Created by emanuele on 07/09/17.
-//
-
 #ifndef PMCSN_OUTPUT_H
 #define PMCSN_OUTPUT_H
 
@@ -11,36 +7,57 @@
 
 double t_star;
 
-struct Batch_stat {
-    long completions;               // # job completed
-    double response_time_avg;       // (response_time_sum / completions )
-    double response_time_std;       // standard deviation for E[T]
-    double response_time_sum_sd;    // sum of squared deviations for Welford's algorithm
+/**
+ * Keeps track of completed tasks
+ * useful for calculating throughput
+ */
+struct Completed {
+    long cloudlet_class_1;      //#jobs of class 1 completed in the cloudlet
+    long cloudlet_class_2;      //#jobs of class 2 completed in the cloudlet
+    long cloud_class_1;         //#jobs of class 1 completed in the cloud
+    long cloud_class_2;         //#jobs of class 2 completed in the cloud
+    long interrupted_class_2;   //#jobs of class 2 interrupted in the cloudlet
+};
 
-    double throughput;
+/**
+ * Statistics gathering structure to calculate
+ * time-averaged numbers
+ */
+struct Area {
+    double node;
+    double cloudlet_node;
+    double cloud_node;
+};
+
+struct Service {
+    double cloudlet_class_1;
+    double cloudlet_class_2;
+    double cloud_class_2;
+    double cloud_class_1;
+
+    double cloudlet_class_2_interrupted;    // time elapsed in cloudlet by an interrupted job
+    double cloud_class_2_interrupted;       // remaining time in cloud + setup
+};
+
+struct Batch_stat {
+    double avg_node;
+    double avg_node_cloudlet;
+    double avg_node_cloud;
 };
 
 struct End_stat {
-    double response_time_avg;
-    double response_time_std;
-
-    double throughput;
+    double avg_node;
+    double avg_node_cloudlet;
+    double avg_node_cloud;
 };
 
+struct Completed *completed;
+struct Area *area;
+struct Service *service;
 struct Batch_stat *batch_stat;
 struct End_stat *end_stat;
 
 void init_output_stats();
-
-double update_batch_running_mean_response_time(int, double);
-
-double update_batch_running_std_response_time(int, double);
-
-double compute_throughput(int);
-
-void compute_end_response_time_stat();
-
-double compute_end_throughput();
 
 double estimate_interval_endpoint(double);
 
