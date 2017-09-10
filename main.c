@@ -152,18 +152,21 @@ void execute_arrival(struct event *arrival_event, int action) {
     update_node_area();
     time.current = time.next;
 
+    struct event *ev;
     switch (action) {
         case SEND_CLASS_1_TO_CLOUD:
             state.cloud_1++;
 
-            create_and_insert_event(EVENT_CLASS_1_CLOUD_COMPLETION, time.current + getServiceClass1Cloud());
+            ev = create_and_insert_event(EVENT_CLASS_1_CLOUD_COMPLETION, time.current + getServiceClass1Cloud());
+            ev->job_size = ev->time - arrival_event->time;
 
             next_arrival(EVENT_CLASS_1_ARRIVAL);
             break;
         case ACCEPT_CLASS_1_ON_CLOUDLET:
             state.cldlet_1++;
 
-            create_and_insert_event(EVENT_CLASS_1_CLOUDLET_COMPLETION, time.current + getServiceClass1Cloudlet());
+            ev = create_and_insert_event(EVENT_CLASS_1_CLOUDLET_COMPLETION, time.current + getServiceClass1Cloudlet());
+            ev->job_size = ev->time - arrival_event->time;
 
             next_arrival(EVENT_CLASS_1_ARRIVAL);
             break;
@@ -180,32 +183,34 @@ void execute_arrival(struct event *arrival_event, int action) {
 
             /* update service time spent for interrupted jobs */
             double wasted_time = time.current - (class_2_event_cloudlet->time - class_2_event_cloudlet->job_size);
-            service->cloudlet_class_2_interrupted += wasted_time;
+            area->service[CLDLET_INTERRUPTED] += wasted_time;
 
             /* compute new service time for interrupted job in the cloud */
             double class_2_cloud_service_time = getServiceClass2Cloud();
             double class_2_cloud_remaining_time = class_2_cloud_service_time * job_remaining_percentage;
             double service_time = class_2_cloud_remaining_time + getSetup();
-            service->cloud_class_2_interrupted += service_time;
-            create_and_insert_event(EVENT_CLASS_2_CLOUD_COMPLETION, time.current + service_time);
+            area->service[CLOUD_INTERRUPTED] += service_time;
+            ev = create_and_insert_event(EVENT_CLASS_2_CLOUD_COMPLETION, time.current + service_time);
+            ev->job_size = ev->time - arrival_event->time;
 
             /*For the job just entered that caused the class 2 job's interruption */
-            create_and_insert_event(EVENT_CLASS_1_CLOUDLET_COMPLETION, time.current + getServiceClass1Cloudlet());
+            ev = create_and_insert_event(EVENT_CLASS_1_CLOUDLET_COMPLETION, time.current + getServiceClass1Cloudlet());
+            ev->job_size = ev->time - arrival_event->time;
 
             break;
         case SEND_CLASS_2_TO_CLOUD:
             state.cloud_2++;
 
-            create_and_insert_event(EVENT_CLASS_2_CLOUD_COMPLETION, time.current + getServiceClass2Cloud());
+            ev = create_and_insert_event(EVENT_CLASS_2_CLOUD_COMPLETION, time.current + getServiceClass2Cloud());
+            ev->job_size = ev->time - arrival_event->time;
 
             next_arrival(EVENT_CLASS_2_ARRIVAL);
             break;
         case ACCEPT_CLASS_2_ON_CLOUDLET:
             state.cldlet_2++;
 
-            struct event *cl_2_event = create_and_insert_event(EVENT_CLASS_2_CLOUDLET_COMPLETION,
-                                                               time.current + getServiceClass2Cloudlet());
-            cl_2_event->job_size = cl_2_event->time - arrival_event->time;
+            ev = create_and_insert_event(EVENT_CLASS_2_CLOUDLET_COMPLETION, time.current + getServiceClass2Cloudlet());
+            ev->job_size = ev->time - arrival_event->time;
 
             next_arrival(EVENT_CLASS_2_ARRIVAL);
             break;
@@ -224,25 +229,25 @@ void execute_completion(struct event *event) {
         case EVENT_CLASS_1_CLOUDLET_COMPLETION:
             state.cldlet_1--;
             completed[current_batch].cloudlet_class_1++;
-            service[current_batch].cloudlet_class_1 += event->job_size;
+            area[current_batch].service[CLDLET_CLASS_1] += event->job_size;
 
             break;
         case EVENT_CLASS_2_CLOUDLET_COMPLETION:
             state.cldlet_2--;
             completed[current_batch].cloudlet_class_2++;
-            service[current_batch].cloudlet_class_2 += event->job_size;
+            area[current_batch].service[CLDLET_CLASS_2] += event->job_size;
 
             break;
         case EVENT_CLASS_1_CLOUD_COMPLETION:
             state.cloud_1--;
             completed[current_batch].cloud_class_1++;
-            service[current_batch].cloud_class_1 += event->job_size;
+            area[current_batch].service[CLOUD_CLASS_1] += event->job_size;
 
             break;
         case EVENT_CLASS_2_CLOUD_COMPLETION:
             state.cloud_2--;
             completed[current_batch].cloud_class_2++;
-            service[current_batch].cloud_class_2 += event->job_size;
+            area[current_batch].service[CLOUD_CLASS_2] += event->job_size;
 
             break;
         default:
@@ -270,7 +275,6 @@ int main(int argc, char **argv) {
     init_arrival();
     init_output_stats();
 
-
     for (current_batch = 0; current_batch < batch_number; current_batch++) {
         batch_end = (current_batch + 1) * batch_time;
         while (time.current < batch_end || (current_batch == batch_number - 1 && jobs_left() != 0)) {
@@ -282,12 +286,20 @@ int main(int argc, char **argv) {
         batch_stat[current_batch].avg_node_cloudlet = area->cloudlet_node / time.current;
         batch_stat[current_batch].avg_node_cloud = area->cloud_node / time.current;
 
-        //TODO compute probabilities
+        compute_batch_service_time(current_batch);
+
     }
 
-    //TODO compute mean and std of batch means
-    //TODO compute throughput
+    compute_probabilities();
+    compute_end_statistics();
+    compute_batch_global_statistics();
+    compute_glb_means_and_stds();
 
+    //TODO stimare intervallo di confidenza: la funzione già c'è
+    //TODO compute throughput
+    //TODO print su console e su file
+
+    //TODO statistiche su numero medio di jobs nel sistema
 
     return 0;
 }
