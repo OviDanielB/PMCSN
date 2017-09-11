@@ -214,7 +214,7 @@ struct event *remove_first_event_by_type(int type) {
  * Pop from queue the first task according to the scheduling.
  * @return task
  */
-struct event *pop_event() {
+struct event *next_event() {
     if(is_empty()){
         return NULL;
     }
@@ -289,3 +289,43 @@ struct event *create_and_insert_event(int type, double time) {
     return event;
 }
 
+
+void print_event(struct event* ev){
+    char *ev_type;
+    if(ev == NULL){
+        printf("NULL EVENT\n");
+        return;
+    }
+    switch(ev->type){
+        case 0:
+            ev_type = "EVENT_CLASS_1_ARRIVAL";
+            break;
+        case 1:
+            ev_type = "EVENT_CLASS_1_CLOUDLET_COMPLETION";
+            break;
+        case 2:
+            ev_type = "EVENT_CLASS_1_CLOUD_COMPLETION";
+            break;
+        case 3:
+            ev_type = "EVENT_CLASS_2_ARRIVAL";
+            break;
+        case 4:
+            ev_type = "EVENT_CLASS_2_CLOUDLET_COMPLETION";
+            break;
+        case 5:
+            ev_type = "EVENT_CLASS_2_CLOUD_COMPLETION";
+            break;
+        case 6:
+            ev_type = "EVENT_CLASS_2_SETUP";
+            break;
+        default:
+            printf("No event type defined : %d\n", ev->type);
+    }
+
+    /* arrival*/
+    if(ev->job_size == -1){
+        printf("Next event = {time : %.2f, type: %s } \n", ev->time, ev_type);
+    } else { /* completion*/
+        printf("Next event = {time : %.2f, type: %s, job_size: %.2f } \n", ev->time, ev_type, ev->job_size);
+    }
+}
