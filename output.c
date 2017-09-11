@@ -178,18 +178,16 @@ void compute_batch_global_statistics(int batch) {
                                     probs[batch].cloud_class_2_interrupted *
                                     (service[CLOUD_INTERRUPTED] + service[CLDLET_INTERRUPTED]);
 
-    //TODO compute throughput for cloudlet and cloud not for class
-    batch_stat[batch].gbl_throughput_class1 =
-            (completed[batch].cloudlet_class_1 + completed[batch].cloud_class_1) / batch_time;
+    batch_stat[batch].gbl_throughput_cloudlet =
+            (completed[batch].cloudlet_class_1 + completed[batch].cloudlet_class_2) / batch_time;
 
-    batch_stat[batch].gbl_throughput_class2 =
-            (completed[batch].cloudlet_class_2 + completed[batch].cloud_class_2)
+    batch_stat[batch].gbl_throughput_cloud =
+            (completed[batch].cloud_class_1 + completed[batch].cloud_class_2)
             / batch_time;
 
     batch_stat[batch].gbl_throughput =
             (completed[batch].cloudlet_class_1 + completed[batch].cloud_class_1
              + completed[batch].cloudlet_class_2 + completed[batch].cloud_class_2) / batch_time;
-
 }
 
 void compute_glb_means_and_stds() {
@@ -253,12 +251,12 @@ void compute_throughput_mean() {
 
     for (i = 0; i < batch_number; i++) {
         sum1 += batch_stat[i].gbl_throughput;
-        sum2 += batch_stat[i].gbl_throughput_class1;
-        sum3 += batch_stat[i].gbl_throughput_class2;
+        sum2 += batch_stat[i].gbl_throughput_cloudlet;
+        sum3 += batch_stat[i].gbl_throughput_cloud;
     }
 
     end_mean->gbl_throughput = 1.0 * sum1 / batch_number;
-    end_mean->gbl_throughput_class1 = 1.0 * sum2 / batch_number;
-    end_mean->gbl_throughput_class2 = 1.0 * sum3 / batch_number;
+    end_mean->gbl_throughput_cloudlet = 1.0 * sum2 / batch_number;
+    end_mean->gbl_throughput_cloud = 1.0 * sum3 / batch_number;
 }
 

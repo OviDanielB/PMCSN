@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <unistd.h>
 #include "event_time_generator.h"
 #include "output.h"
 
@@ -321,7 +322,7 @@ int main(int argc, char **argv) {
     compute_throughput_mean();
 
     printf("E[N]=%f ; E[N_cloudlet]=%f ; E[N_cloud]=%f\n", end_mean->node, end_mean->node_cloudlet, end_mean->node_cloud);
-    printf("throughput = %f\n", end_mean->gbl_throughput);
+    printf("tht=%f  tht_cloudlet=%f ; tht_cloud=%f\n", end_mean->gbl_throughput, end_mean->gbl_throughput_cloudlet, end_mean->gbl_throughput_cloud);
 
     printf("E[t]: %f std: %f\n", end_mean->glb_service, end_std->glb_service);
     printf("E[t_class1]: %f std: %f\n", end_mean->glb_service_class1, end_std->glb_service_class1);
@@ -336,6 +337,9 @@ int main(int argc, char **argv) {
     printf("E[t_class1] - %f <= mu <= E[t_class1] + %f\n", ci_service_class1, ci_service_class1);
     printf("E[t_class2] - %f <= mu <= E[t_class2] + %f\n", ci_service_class2, ci_service_class2);
 
-    //TODO print su console e su file
+    FILE *file = open_results_file();
+    write_s_resp_time_throu(file, S, end_mean->glb_service, end_mean->gbl_throughput);
+    fclose(file);
+
     return 0;
 }
