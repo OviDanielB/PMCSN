@@ -174,7 +174,7 @@ void execute_arrival(struct event *arrival_event, int action) {
             state.cldlet_1++;
             state.cldlet_2--;
             state.cloud_2++;
-            completed->interrupted_class_2++;
+            completed[current_batch].interrupted_class_2++;
 
             /* compute remaining service time for job of class 2 to interrupt */
             struct event *class_2_event_cloudlet = remove_first_event_by_type(EVENT_CLASS_2_CLOUDLET_COMPLETION);
@@ -183,13 +183,13 @@ void execute_arrival(struct event *arrival_event, int action) {
 
             /* update service time spent for interrupted jobs */
             double wasted_time = time.current - (class_2_event_cloudlet->time - class_2_event_cloudlet->job_size);
-            area->service[CLDLET_INTERRUPTED] += wasted_time;
+            area[current_batch].service[CLDLET_INTERRUPTED] += wasted_time;
 
             /* compute new service time for interrupted job in the cloud */
             double class_2_cloud_service_time = getServiceClass2Cloud();
             double class_2_cloud_remaining_time = class_2_cloud_service_time * job_remaining_percentage;
             double service_time = class_2_cloud_remaining_time + getSetup();
-            area->service[CLOUD_INTERRUPTED] += service_time;
+            area[current_batch].service[CLOUD_INTERRUPTED] += service_time;
             ev = create_and_insert_event(EVENT_CLASS_2_CLOUD_COMPLETION, time.current + service_time);
             ev->job_size = ev->time - arrival_event->time;
 
@@ -276,6 +276,7 @@ int main(int argc, char **argv) {
     init_output_stats();
 
     for (current_batch = 0; current_batch < batch_number; current_batch++) {
+
         batch_end = (current_batch + 1) * batch_time;
         while (time.current < batch_end || (current_batch == batch_number - 1 && jobs_left() != 0)) {
             process_event(pop_event());
@@ -287,7 +288,6 @@ int main(int argc, char **argv) {
         batch_stat[current_batch].avg_node_cloud = area->cloud_node / time.current;
 
         compute_batch_service_time(current_batch);
-
     }
 
     compute_probabilities();
@@ -295,12 +295,15 @@ int main(int argc, char **argv) {
     compute_batch_global_statistics();
     compute_glb_means_and_stds();
 
+    printf("mean service time: %f std: %f\n", end_mean->glb_service, end_std->glb_service);
+    printf("mean service time for a class 1 job: %f std: %f\n", end_mean->glb_service_class1, end_std->glb_service_class1);
+    printf("mean service time for a class 2 job: %f std: %f\n", end_mean->glb_service_class2, end_std->glb_service_class2);
+
+
+
     double ci_service = estimate_interval_endpoint(end_std->glb_service);
     double ci_service_class1 = estimate_interval_endpoint(end_std->glb_service_class1);
     double ci_service_class2 = estimate_interval_endpoint(end_std->glb_service_class2);
-
-    printf("%f\n", end_mean->glb_service);
-    printf("%f\n", end_std->glb_service);
 
     //TODO compute throughput
     //TODO print su console e su file
