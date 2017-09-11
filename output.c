@@ -201,19 +201,20 @@ void compute_glb_means_and_stds() {
     for (i = 1; i < batch_number; i++) {
         end_mean->glb_service_class1 = update_running_mean(end_mean->glb_service_class1,
                                                            batch_stat[i].glb_service_class1, i);
-        end_std[i].glb_service_class1 = update_running_sample_sum_sd(end_std[i].glb_service_class1,
+        end_std->glb_service_class1 = update_running_sample_sum_sd(end_std->glb_service_class1,
                                                                      end_mean->glb_service_class1,
                                                                      batch_stat[i].glb_service_class1, i);
 
         end_mean->glb_service_class2 = update_running_mean(end_mean->glb_service_class2,
                                                            batch_stat[i].glb_service_class2, i);
-        end_std[i].glb_service_class2 = update_running_sample_sum_sd(end_std[i].glb_service_class2,
+        end_std->glb_service_class2 = update_running_sample_sum_sd(end_std->glb_service_class2,
                                                                      end_mean->glb_service_class2,
                                                                      batch_stat[i].glb_service_class2, i);
 
         end_mean->glb_service = update_running_mean(end_mean->glb_service, batch_stat[i].glb_service, i);
-        end_std[i].glb_service = update_running_sample_sum_sd(end_std[i].glb_service, end_mean->glb_service,
+        end_std->glb_service = update_running_sample_sum_sd(end_std->glb_service, end_mean->glb_service,
                                                               batch_stat[i].glb_service, i);
+
     }
 
     end_std->glb_service_class1 = sqrt(1.0 * end_std->glb_service_class1 / i);

@@ -171,10 +171,6 @@ void update_node_area() {
 
 void execute_arrival(struct event *arrival_event, int action) {
 
-    time.next = arrival_event->time;
-    update_node_area();
-    time.current = time.next;
-
     struct event *ev;
     switch (action) {
         case SEND_CLASS_1_TO_CLOUD:
@@ -220,6 +216,8 @@ void execute_arrival(struct event *arrival_event, int action) {
             ev = create_and_insert_event(EVENT_CLASS_1_CLOUDLET_COMPLETION, time.current + getServiceClass1Cloudlet());
             ev->job_size = ev->time - arrival_event->time;
 
+            next_arrival(EVENT_CLASS_1_ARRIVAL);
+
             break;
         case SEND_CLASS_2_TO_CLOUD:
             state.cloud_2++;
@@ -242,12 +240,9 @@ void execute_arrival(struct event *arrival_event, int action) {
     }
 
     print_state(state);
-
 }
 
 void execute_completion(struct event *event) {
-
-    time.current = event->time;
 
     switch (event->type) {
         case EVENT_CLASS_1_CLOUDLET_COMPLETION:
@@ -284,6 +279,10 @@ void execute_completion(struct event *event) {
 void process_event(struct event *event) {
 
     print_event(event);
+
+    time.next = event->time;
+    update_node_area();
+    time.current = time.next;
 
     int dispatch_action;
     if (is_arrival(event)) {
@@ -324,6 +323,7 @@ int main(int argc, char **argv) {
     compute_glb_means_and_stds();
 
     printf("mean service time: %f std: %f\n", end_mean->glb_service, end_std->glb_service);
+
     printf("mean service time for a class 1 job: %f std: %f\n", end_mean->glb_service_class1, end_std->glb_service_class1);
     printf("mean service time for a class 2 job: %f std: %f\n", end_mean->glb_service_class2, end_std->glb_service_class2);
 
