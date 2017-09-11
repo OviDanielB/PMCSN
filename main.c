@@ -295,7 +295,13 @@ int main(int argc, char **argv) {
     compute_batch_global_statistics();
     compute_glb_means_and_stds();
 
-    //TODO stimare intervallo di confidenza: la funzione già c'è
+    double ci_service = estimate_interval_endpoint(end_std->glb_service);
+    double ci_service_class1 = estimate_interval_endpoint(end_std->glb_service_class1);
+    double ci_service_class2 = estimate_interval_endpoint(end_std->glb_service_class2);
+
+    printf("%f\n", end_mean->glb_service);
+    printf("%f\n", end_std->glb_service);
+
     //TODO compute throughput
     //TODO print su console e su file
 

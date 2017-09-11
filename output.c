@@ -56,7 +56,7 @@ void init_output_stats() {
  * @return updated mean
  */
 double update_running_mean(double *mean, double value, long i) {
-    return *mean += ((value - (*mean)) / i);
+    return *mean += ((value - *mean) / i);
 }
 
 /**
@@ -141,18 +141,18 @@ struct Probabilities *compute_probabilities() {
     probs->cloud_class_2_interrupted = (double) completed->interrupted_class_2 / tot;
 
 
-    probs->cloud_class_1_on_1 = completed->cloud_class_1 / tot_class_1;
-    probs->cloudlet_class_1_on_1 = completed->cloudlet_class_1 / tot_class_1;
-    probs->cloud_class_2_on_2 = (completed->cloud_class_2 - completed->interrupted_class_2) / tot_class_2;
-    probs->cloudlet_class_2_on_2 = completed->cloudlet_class_2 / tot_class_2;
-    probs->cloud_class_2_interrupted_on_2 = completed->interrupted_class_2 / tot_class_2;
+    probs->cloud_class_1_on_1 = (double) completed->cloud_class_1 / tot_class_1;
+    probs->cloudlet_class_1_on_1 = (double) completed->cloudlet_class_1 / tot_class_1;
+    probs->cloud_class_2_on_2 = (double) (completed->cloud_class_2 - completed->interrupted_class_2) / tot_class_2;
+    probs->cloudlet_class_2_on_2 = (double) completed->cloudlet_class_2 / tot_class_2;
+    probs->cloud_class_2_interrupted_on_2 = (double) completed->interrupted_class_2 / tot_class_2;
 
     return probs;
 }
 
 void compute_end_statistics() {
 
-    int i, type;
+    int i=0, type;
     for (type = 0; type < 5; type++) {
         end_mean->service[type] = batch_stat[0].service[type];
         for (i = 1; i < batch_number; i++) {
