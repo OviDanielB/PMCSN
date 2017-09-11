@@ -75,8 +75,8 @@ struct Batch_stat {
     double glb_service_class2;  //E[T] for a class_2 jobs
     double glb_service;         //E[T] for any jobs
 
-    double gbl_throughput_class1;
-    double gbl_throughput_class2;
+    double gbl_throughput_cloudlet;
+    double gbl_throughput_cloud;
     double gbl_throughput;
 };
 
@@ -90,8 +90,8 @@ struct End_mean {
     double glb_service_class2;  //E[T] for a class_2 jobs
     double glb_service;         //E[T] for any jobs
 
-    double gbl_throughput_class1;
-    double gbl_throughput_class2;
+    double gbl_throughput_cloudlet;
+    double gbl_throughput_cloud;
     double gbl_throughput;
 };
 
