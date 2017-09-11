@@ -4,6 +4,9 @@
 
 #import <math.h>
 
+
+int LOG = 1; /* if 1 log is enabled, 0 is disabled */
+
 long fact(int x){
     int c;
     long fact = 1;
@@ -46,4 +49,9 @@ long gcd ( long a, long b )
         c = a; a = b%a;  b = c;
     }
     return b;
+}
+
+void log_debug(char *msg){
+    if(LOG)
+        printf("%s \n",msg);
 }

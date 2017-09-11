@@ -77,3 +77,5 @@ double batch_time;  // time dedicated to one batch
 
 int N;              // max jobs in the queue
 int S;              // threshold value
+
+

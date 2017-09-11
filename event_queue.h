@@ -66,7 +66,7 @@ struct event *remove_first_event_by_type(int type);
  * Pop from queue the first task according to the scheduling.
  * @return task
  */
-struct event *pop_event();
+struct event *next_event();
 
 /**
  * Push a new task in the queue.
@@ -74,3 +74,5 @@ struct event *pop_event();
  * @param time
  */
 struct event *create_and_insert_event(int type, double time);
+
+void print_event(struct event* ev);

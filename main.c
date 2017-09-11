@@ -7,13 +7,14 @@
  * Represents the number of tasks
  * in each part of the system
  */
-struct {
+struct state{
     long cldlet_1;
     long cldlet_2;
     long cloud_1;
     long cloud_2;
     long setup_2;
 } state = {0, 0, 0, 0, 0};
+
 
 /**
  * Keeps track of simulation time
@@ -26,6 +27,18 @@ struct {
 int current_batch = 0;                   // batch in execution
 double batch_end;
 double simulation_end;
+
+
+
+/**
+ * prints current system state
+ * @param st state
+ */
+void print_state(struct state st){
+
+    printf("System state: {cloudlet_1 : %ld, cloudlet_2: %ld, cloud_1: %ld, cloud_2: %ld, setup_2: %ld }\n",
+           st.cldlet_1, st.cldlet_2, st.cloud_1, st.cloud_2, st.setup_2);
+}
 
 /**
  * initialize first arrival time events
@@ -95,24 +108,34 @@ int dispatch(struct event *event) {
     switch (event->type) {
         case EVENT_CLASS_1_ARRIVAL:
             if (state.cldlet_1 == N) {
+                log_debug("Class 1 sent to cloud");
                 return SEND_CLASS_1_TO_CLOUD;
             } else {
                 if (state.cldlet_1 + state.cldlet_2 < S) {
+                    log_debug("Class 1 accepted on cloudlet");
                     return ACCEPT_CLASS_1_ON_CLOUDLET;
                 } else {
-                    if (state.cldlet_2 > 0)
+                    if (state.cldlet_2 > 0) {
+                        log_debug("Class 1 accepted on cloudlet and class 2 interrupted on cloudlet and sent on cloud");
                         return INTERRUPT_CLASS_2_ON_CLOUDLET_AND_SEND_TO_CLOUD;
-                    else
+                    }
+                    else {
+                        log_debug("Class 1 accepted on cloudlet");
                         return ACCEPT_CLASS_1_ON_CLOUDLET;
+                    }
 
                 }
             }
 
         case EVENT_CLASS_2_ARRIVAL:
-            if (state.cldlet_1 + state.cldlet_2 >= S)
+            if (state.cldlet_1 + state.cldlet_2 >= S) {
+                log_debug("Class 2 sent on cloud");
                 return SEND_CLASS_2_TO_CLOUD;
-            else
+            }
+            else {
+                log_debug("Class 2 accepted on cloudlet");
                 return ACCEPT_CLASS_2_ON_CLOUDLET;
+            }
         default:
             fprintf(stderr, "Event type should be an arrival!\n");
             exit(EXIT_FAILURE);
@@ -218,6 +241,7 @@ void execute_arrival(struct event *arrival_event, int action) {
             fprintf(stderr, "No action matching!\n");
     }
 
+    print_state(state);
 
 }
 
@@ -253,9 +277,13 @@ void execute_completion(struct event *event) {
         default:
             fprintf(stderr, "No completion type matching!\n");
     }
+
+    print_state(state);
 }
 
 void process_event(struct event *event) {
+
+    print_event(event);
 
     int dispatch_action;
     if (is_arrival(event)) {
@@ -279,7 +307,7 @@ int main(int argc, char **argv) {
 
         batch_end = (current_batch + 1) * batch_time;
         while (time.current < batch_end || (current_batch == batch_number - 1 && jobs_left() != 0)) {
-            process_event(pop_event());
+            process_event(next_event());
         }
 
         /* Warning: The denominator must be time.current and NOT batch_end for computation correctness*/
