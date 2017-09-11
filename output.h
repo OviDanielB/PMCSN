@@ -89,6 +89,10 @@ struct End_mean {
     double glb_service_class1;  //E[T] for class_1 jobs
     double glb_service_class2;  //E[T] for a class_2 jobs
     double glb_service;         //E[T] for any jobs
+
+    double gbl_throughput_class1;
+    double gbl_throughput_class2;
+    double gbl_throughput;
 };
 
 struct End_std {
@@ -125,6 +129,6 @@ double estimate_interval_endpoint(double);
 
 void compute_job_number_mean();
 
-
+void compute_throughput_mean();
 
 

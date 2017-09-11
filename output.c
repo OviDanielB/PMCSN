@@ -178,20 +178,17 @@ void compute_batch_global_statistics(int batch) {
                                     probs[batch].cloud_class_2_interrupted *
                                     (service[CLOUD_INTERRUPTED] + service[CLDLET_INTERRUPTED]);
 
-        batch_stat[batch].gbl_throughput_class1 =
-                (completed[batch].cloudlet_class_1 + completed[batch].cloud_class_1) / batch_time;
+    //TODO compute throughput for cloudlet and cloud not for class
+    batch_stat[batch].gbl_throughput_class1 =
+            (completed[batch].cloudlet_class_1 + completed[batch].cloud_class_1) / batch_time;
 
-        batch_stat[batch].gbl_throughput_class2 =
-                (completed[batch].cloudlet_class_2 + completed[batch].cloud_class_2 + completed[batch].interrupted_class_2)
-                / batch_time;
+    batch_stat[batch].gbl_throughput_class2 =
+            (completed[batch].cloudlet_class_2 + completed[batch].cloud_class_2)
+            / batch_time;
 
-        batch_stat[batch].gbl_throughput =
-                (completed[batch].cloudlet_class_1 + completed[batch].cloud_class_1
-                       + completed[batch].cloudlet_class_2 + completed[batch].cloud_class_2 + completed[batch].interrupted_class_2) / batch_time;
-
-        printf("batch %d mean service time: %f throughput: %f\n", batch, batch_stat[batch].glb_service, batch_stat[batch].gbl_throughput);
-        printf("batch %d mean service time for a class 1 job: %f throughput: %f\n", batch, batch_stat[batch].glb_service_class1, batch_stat[batch].gbl_throughput_class1);
-        printf("batch %d mean service time for a class 2 job: %f throughput: %f\n", batch, batch_stat[batch].glb_service_class2, batch_stat[batch].gbl_throughput_class2);
+    batch_stat[batch].gbl_throughput =
+            (completed[batch].cloudlet_class_1 + completed[batch].cloud_class_1
+             + completed[batch].cloudlet_class_2 + completed[batch].cloud_class_2) / batch_time;
 
 }
 
@@ -250,4 +247,18 @@ void compute_job_number_mean() {
     end_std->node_cloud = sqrt(1.0 * end_std->node_cloud / i);
 }
 
+void compute_throughput_mean() {
+    int i = 0;
+    double sum1 = 0, sum2 = 0, sum3 = 0;
+
+    for (i = 0; i < batch_number; i++) {
+        sum1 += batch_stat[i].gbl_throughput;
+        sum2 += batch_stat[i].gbl_throughput_class1;
+        sum3 += batch_stat[i].gbl_throughput_class2;
+    }
+
+    end_mean->gbl_throughput = 1.0 * sum1 / batch_number;
+    end_mean->gbl_throughput_class1 = 1.0 * sum2 / batch_number;
+    end_mean->gbl_throughput_class2 = 1.0 * sum3 / batch_number;
+}
 

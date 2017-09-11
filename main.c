@@ -306,10 +306,9 @@ int main(int argc, char **argv) {
             process_event(next_event());
         }
 
-        /* Warning: The denominator must be time.current and NOT batch_end for computation correctness*/
-        batch_stat[current_batch].avg_node = area->node / time.current;
-        batch_stat[current_batch].avg_node_cloudlet = area->cloudlet_node / time.current;
-        batch_stat[current_batch].avg_node_cloud = area->cloud_node / time.current;
+        batch_stat[current_batch].avg_node = area[current_batch].node / batch_time;
+        batch_stat[current_batch].avg_node_cloudlet = area[current_batch].cloudlet_node / batch_time;
+        batch_stat[current_batch].avg_node_cloud = area[current_batch].cloud_node / batch_time;
 
         compute_batch_service_time(current_batch);
         compute_probabilities(current_batch);
@@ -319,9 +318,10 @@ int main(int argc, char **argv) {
     compute_end_statistics();
     compute_glb_means_and_stds();
     compute_job_number_mean();
+    compute_throughput_mean();
 
-    printf("E[N]=%f ; E[N_cloud]=%f ; E[N_cloudlet]=%f\n", end_mean->node, end_mean->node_cloud,
-           end_mean->node_cloudlet);
+    printf("E[N]=%f ; E[N_cloudlet]=%f ; E[N_cloud]=%f\n", end_mean->node, end_mean->node_cloudlet, end_mean->node_cloud);
+    printf("throughput = %f\n", end_mean->gbl_throughput);
 
     printf("E[t]: %f std: %f\n", end_mean->glb_service, end_std->glb_service);
     printf("E[t_class1]: %f std: %f\n", end_mean->glb_service_class1, end_std->glb_service_class1);
@@ -336,11 +336,6 @@ int main(int argc, char **argv) {
     printf("E[t_class1] - %f <= mu <= E[t_class1] + %f\n", ci_service_class1, ci_service_class1);
     printf("E[t_class2] - %f <= mu <= E[t_class2] + %f\n", ci_service_class2, ci_service_class2);
 
-
-    //TODO compute throughput
     //TODO print su console e su file
-
-    //TODO statistiche su numero medio di jobs nel sistema
-
     return 0;
 }
