@@ -3,6 +3,7 @@
 //
 
 #import <math.h>
+#include <stdio.h>
 
 
 int LOG = 1; /* if 1 log is enabled, 0 is disabled */
@@ -54,4 +55,15 @@ long gcd ( long a, long b )
 void log_debug(char *msg){
     if(LOG)
         printf("%s \n",msg);
+}
+
+
+FILE * open_results_file(){
+
+    FILE *fp = fopen("../simulation_results/res.csv","a+");
+    return fp;
+}
+
+void write_s_resp_time_throu(FILE *fp, int S, double resp_time, double throughput){
+    fprintf(fp,"%d; %f; %f\n", S,resp_time,throughput);
 }

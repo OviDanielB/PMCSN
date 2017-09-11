@@ -3,6 +3,7 @@
 #include "output.h"
 
 
+
 /**
  * Represents the number of tasks
  * in each part of the system
@@ -28,6 +29,8 @@ int current_batch = 0;                   // batch in execution
 double batch_end;
 double simulation_end;
 
+
+FILE *file_results;
 
 
 /**
@@ -296,6 +299,8 @@ void process_event(struct event *event) {
 
 int main(int argc, char **argv) {
 
+    /* open file for writing results */
+    file_results = open_results_file();
 
     init_params(argc, argv);
     /* plants a seed for the stream generator (automatically generates seed for every stream) */
@@ -316,6 +321,8 @@ int main(int argc, char **argv) {
         batch_stat[current_batch].avg_node_cloud = area->cloud_node / time.current;
 
         compute_batch_service_time(current_batch);
+
+
     }
 
     compute_probabilities();

@@ -13,3 +13,7 @@ long gcd(long a,long b);
 long fact(int x);
 
 void log_debug(char * msg);
+
+FILE *open_results_file();
+
+void write_s_resp_time_throu(FILE *fp,int S, double resp_time, double throughput);
