@@ -178,9 +178,20 @@ void compute_batch_global_statistics(int batch) {
                                     probs[batch].cloud_class_2_interrupted *
                                     (service[CLOUD_INTERRUPTED] + service[CLDLET_INTERRUPTED]);
 
-    printf("batch %d mean service time: %f\n", batch, batch_stat[batch].glb_service);
-    printf("batch %d mean service time for a class 1 job: %f\n", batch, batch_stat[batch].glb_service_class1);
-    printf("batch %d mean service time for a class 2 job: %f\n", batch, batch_stat[batch].glb_service_class2);
+        batch_stat[batch].gbl_throughput_class1 =
+                (completed[batch].cloudlet_class_1 + completed[batch].cloud_class_1) / batch_time;
+
+        batch_stat[batch].gbl_throughput_class2 =
+                (completed[batch].cloudlet_class_2 + completed[batch].cloud_class_2 + completed[batch].interrupted_class_2)
+                / batch_time;
+
+        batch_stat[batch].gbl_throughput =
+                (completed[batch].cloudlet_class_1 + completed[batch].cloud_class_1
+                       + completed[batch].cloudlet_class_2 + completed[batch].cloud_class_2 + completed[batch].interrupted_class_2) / batch_time;
+
+        printf("batch %d mean service time: %f throughput: %f\n", batch, batch_stat[batch].glb_service, batch_stat[batch].gbl_throughput);
+        printf("batch %d mean service time for a class 1 job: %f throughput: %f\n", batch, batch_stat[batch].glb_service_class1, batch_stat[batch].gbl_throughput_class1);
+        printf("batch %d mean service time for a class 2 job: %f throughput: %f\n", batch, batch_stat[batch].glb_service_class2, batch_stat[batch].gbl_throughput_class2);
 
 }
 
