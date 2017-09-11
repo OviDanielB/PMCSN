@@ -7,7 +7,7 @@
  * Represents the number of tasks
  * in each part of the system
  */
-struct state{
+struct state {
     long cldlet_1;
     long cldlet_2;
     long cloud_1;
@@ -29,12 +29,11 @@ double batch_end;
 double simulation_end;
 
 
-
 /**
  * prints current system state
  * @param st state
  */
-void print_state(struct state st){
+void print_state(struct state st) {
 
     printf("System state: {cloudlet_1 : %ld, cloudlet_2: %ld, cloud_1: %ld, cloud_2: %ld, setup_2: %ld }\n",
            st.cldlet_1, st.cldlet_2, st.cloud_1, st.cloud_2, st.setup_2);
@@ -118,8 +117,7 @@ int dispatch(struct event *event) {
                     if (state.cldlet_2 > 0) {
                         log_debug("Class 1 accepted on cloudlet and class 2 interrupted on cloudlet and sent on cloud");
                         return INTERRUPT_CLASS_2_ON_CLOUDLET_AND_SEND_TO_CLOUD;
-                    }
-                    else {
+                    } else {
                         log_debug("Class 1 accepted on cloudlet");
                         return ACCEPT_CLASS_1_ON_CLOUDLET;
                     }
@@ -131,8 +129,7 @@ int dispatch(struct event *event) {
             if (state.cldlet_1 + state.cldlet_2 >= S) {
                 log_debug("Class 2 sent on cloud");
                 return SEND_CLASS_2_TO_CLOUD;
-            }
-            else {
+            } else {
                 log_debug("Class 2 accepted on cloudlet");
                 return ACCEPT_CLASS_2_ON_CLOUDLET;
             }
@@ -316,17 +313,18 @@ int main(int argc, char **argv) {
         batch_stat[current_batch].avg_node_cloud = area->cloud_node / time.current;
 
         compute_batch_service_time(current_batch);
+        compute_probabilities(current_batch);
+        compute_batch_global_statistics(current_batch);
     }
 
-    compute_probabilities();
-    compute_end_statistics();
-    compute_batch_global_statistics();
+//    compute_end_statistics();
     compute_glb_means_and_stds();
 
     printf("mean service time: %f std: %f\n", end_mean->glb_service, end_std->glb_service);
-    printf("mean service time for a class 1 job: %f std: %f\n", end_mean->glb_service_class1, end_std->glb_service_class1);
-    printf("mean service time for a class 2 job: %f std: %f\n", end_mean->glb_service_class2, end_std->glb_service_class2);
-
+    printf("mean service time for a class 1 job: %f std: %f\n", end_mean->glb_service_class1,
+           end_std->glb_service_class1);
+    printf("mean service time for a class 2 job: %f std: %f\n", end_mean->glb_service_class2,
+           end_std->glb_service_class2);
 
 
     double ci_service = estimate_interval_endpoint(end_std->glb_service);

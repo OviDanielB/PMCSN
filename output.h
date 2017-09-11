@@ -111,12 +111,11 @@ struct Batch_stat *compute_batch_service_time(int);
 
 void compute_end_statistics();
 
-void compute_batch_global_statistics();
+void compute_batch_global_statistics(int);
 
 void compute_glb_means_and_stds();
 
-
-struct Probabilities *compute_probabilities();
+struct Probabilities *compute_probabilities(int);
 
 double estimate_interval_endpoint(double);
 
