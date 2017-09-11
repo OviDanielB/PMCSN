@@ -3,12 +3,11 @@
 #include "output.h"
 
 
-
 /**
  * Represents the number of tasks
  * in each part of the system
  */
-struct state{
+struct state {
     long cldlet_1;
     long cldlet_2;
     long cloud_1;
@@ -30,14 +29,11 @@ double batch_end;
 double simulation_end;
 
 
-FILE *file_results;
-
-
 /**
  * prints current system state
  * @param st state
  */
-void print_state(struct state st){
+void print_state(struct state st) {
 
     printf("System state: {cloudlet_1 : %ld, cloudlet_2: %ld, cloud_1: %ld, cloud_2: %ld, setup_2: %ld }\n",
            st.cldlet_1, st.cldlet_2, st.cloud_1, st.cloud_2, st.setup_2);
@@ -121,8 +117,7 @@ int dispatch(struct event *event) {
                     if (state.cldlet_2 > 0) {
                         log_debug("Class 1 accepted on cloudlet and class 2 interrupted on cloudlet and sent on cloud");
                         return INTERRUPT_CLASS_2_ON_CLOUDLET_AND_SEND_TO_CLOUD;
-                    }
-                    else {
+                    } else {
                         log_debug("Class 1 accepted on cloudlet");
                         return ACCEPT_CLASS_1_ON_CLOUDLET;
                     }
@@ -134,8 +129,7 @@ int dispatch(struct event *event) {
             if (state.cldlet_1 + state.cldlet_2 >= S) {
                 log_debug("Class 2 sent on cloud");
                 return SEND_CLASS_2_TO_CLOUD;
-            }
-            else {
+            } else {
                 log_debug("Class 2 accepted on cloudlet");
                 return ACCEPT_CLASS_2_ON_CLOUDLET;
             }
@@ -173,10 +167,6 @@ void update_node_area() {
 }
 
 void execute_arrival(struct event *arrival_event, int action) {
-
-    time.next = arrival_event->time;
-    update_node_area();
-    time.current = time.next;
 
     struct event *ev;
     switch (action) {
@@ -223,6 +213,8 @@ void execute_arrival(struct event *arrival_event, int action) {
             ev = create_and_insert_event(EVENT_CLASS_1_CLOUDLET_COMPLETION, time.current + getServiceClass1Cloudlet());
             ev->job_size = ev->time - arrival_event->time;
 
+            next_arrival(EVENT_CLASS_1_ARRIVAL);
+
             break;
         case SEND_CLASS_2_TO_CLOUD:
             state.cloud_2++;
@@ -245,12 +237,9 @@ void execute_arrival(struct event *arrival_event, int action) {
     }
 
     print_state(state);
-
 }
 
 void execute_completion(struct event *event) {
-
-    time.current = event->time;
 
     switch (event->type) {
         case EVENT_CLASS_1_CLOUDLET_COMPLETION:
@@ -288,6 +277,10 @@ void process_event(struct event *event) {
 
     print_event(event);
 
+    time.next = event->time;
+    update_node_area();
+    time.current = time.next;
+
     int dispatch_action;
     if (is_arrival(event)) {
         dispatch_action = dispatch(event);
@@ -299,8 +292,6 @@ void process_event(struct event *event) {
 
 int main(int argc, char **argv) {
 
-    /* open file for writing results */
-    file_results = open_results_file();
 
     init_params(argc, argv);
     /* plants a seed for the stream generator (automatically generates seed for every stream) */
@@ -315,35 +306,36 @@ int main(int argc, char **argv) {
             process_event(next_event());
         }
 
-        /* Warning: The denominator must be time.current and NOT batch_end for computation correctness*/
-        batch_stat[current_batch].avg_node = area->node / time.current;
-        batch_stat[current_batch].avg_node_cloudlet = area->cloudlet_node / time.current;
-        batch_stat[current_batch].avg_node_cloud = area->cloud_node / time.current;
+        batch_stat[current_batch].avg_node = area[current_batch].node / batch_time;
+        batch_stat[current_batch].avg_node_cloudlet = area[current_batch].cloudlet_node / batch_time;
+        batch_stat[current_batch].avg_node_cloud = area[current_batch].cloud_node / batch_time;
 
         compute_batch_service_time(current_batch);
-
-
+        compute_probabilities(current_batch);
+        compute_batch_global_statistics(current_batch);
     }
 
-    compute_probabilities();
     compute_end_statistics();
-    compute_batch_global_statistics();
     compute_glb_means_and_stds();
+    compute_job_number_mean();
+    compute_throughput_mean();
 
-    printf("mean service time: %f std: %f\n", end_mean->glb_service, end_std->glb_service);
-    printf("mean service time for a class 1 job: %f std: %f\n", end_mean->glb_service_class1, end_std->glb_service_class1);
-    printf("mean service time for a class 2 job: %f std: %f\n", end_mean->glb_service_class2, end_std->glb_service_class2);
+    printf("E[N]=%f ; E[N_cloudlet]=%f ; E[N_cloud]=%f\n", end_mean->node, end_mean->node_cloudlet, end_mean->node_cloud);
+    printf("throughput = %f\n", end_mean->gbl_throughput);
 
+    printf("E[t]: %f std: %f\n", end_mean->glb_service, end_std->glb_service);
+    printf("E[t_class1]: %f std: %f\n", end_mean->glb_service_class1, end_std->glb_service_class1);
+    printf("E[t_class2]: %f std: %f\n", end_mean->glb_service_class2, end_std->glb_service_class2);
 
 
     double ci_service = estimate_interval_endpoint(end_std->glb_service);
     double ci_service_class1 = estimate_interval_endpoint(end_std->glb_service_class1);
     double ci_service_class2 = estimate_interval_endpoint(end_std->glb_service_class2);
 
-    //TODO compute throughput
+    printf("E[t] - %f <= mu <= E[t] + %f\n", ci_service, ci_service);
+    printf("E[t_class1] - %f <= mu <= E[t_class1] + %f\n", ci_service_class1, ci_service_class1);
+    printf("E[t_class2] - %f <= mu <= E[t_class2] + %f\n", ci_service_class2, ci_service_class2);
+
     //TODO print su console e su file
-
-    //TODO statistiche su numero medio di jobs nel sistema
-
     return 0;
 }
