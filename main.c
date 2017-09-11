@@ -25,6 +25,8 @@ struct {
     double next;
 } time = {0.0, 0.0};
 
+int seed = 12345;
+
 int current_batch = 0;                   // batch in execution
 double batch_end;
 double simulation_end;
@@ -69,8 +71,8 @@ int read_int(char **argv, int arg_index) {
 
 void init_params(int argc, char **argv) {
 
-    if (argc != 5) {
-        fprintf(stderr, "Usage %s <N> <S> <#Batch> <Batch size>\n", argv[0]);
+    if (argc != 6) {
+        fprintf(stderr, "Usage %s <N> <S> <#Batch> <Batch size> <Seed>\n", argv[0]);
         exit(EXIT_FAILURE);
     }
 
@@ -78,6 +80,7 @@ void init_params(int argc, char **argv) {
     S = read_int(argv, 2);
     batch_number = read_int(argv, 3);
     batch_time = read_int(argv, 4);
+    seed = read_int(argv,5);
 
     simulation_end = (batch_number) * batch_time;
 
@@ -296,7 +299,7 @@ int main(int argc, char **argv) {
 
     init_params(argc, argv);
     /* plants a seed for the stream generator (automatically generates seed for every stream) */
-    PlantSeeds(SEED);
+    PlantSeeds(seed);
     init_arrival();
     init_output_stats();
 
