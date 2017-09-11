@@ -161,26 +161,26 @@ void compute_end_statistics() {
 
 void compute_batch_global_statistics(int batch) {
 
-        double *service = batch_stat[batch].service;
+    double *service = batch_stat[batch].service;
 
-        batch_stat[batch].glb_service_class1 = probs[batch].cloudlet_class_1_on_1 * service[CLDLET_CLASS_1] +
+    batch_stat[batch].glb_service_class1 = probs[batch].cloudlet_class_1_on_1 * service[CLDLET_CLASS_1] +
                                            probs[batch].cloud_class_1_on_1 * service[CLOUD_CLASS_1];
 
-        batch_stat[batch].glb_service_class2 = probs[batch].cloudlet_class_2_on_2 * service[CLDLET_CLASS_2] +
+    batch_stat[batch].glb_service_class2 = probs[batch].cloudlet_class_2_on_2 * service[CLDLET_CLASS_2] +
                                            probs[batch].cloud_class_2_on_2 * service[CLOUD_CLASS_2] +
                                            probs[batch].cloud_class_2_interrupted_on_2 *
                                            (service[CLDLET_INTERRUPTED] + service[CLOUD_INTERRUPTED]);
 
-        batch_stat[batch].glb_service = probs[batch].cloud_class_1 * service[CLOUD_CLASS_1] +
+    batch_stat[batch].glb_service = probs[batch].cloud_class_1 * service[CLOUD_CLASS_1] +
                                     probs[batch].cloudlet_class_1 * service[CLDLET_CLASS_1] +
                                     probs[batch].cloud_class_2 * service[CLOUD_CLASS_2] +
                                     probs[batch].cloudlet_class_2 * service[CLDLET_CLASS_2] +
                                     probs[batch].cloud_class_2_interrupted *
                                     (service[CLOUD_INTERRUPTED] + service[CLDLET_INTERRUPTED]);
 
-        printf("batch %d mean service time: %f\n", batch, batch_stat[batch].glb_service);
-        printf("batch %d mean service time for a class 1 job: %f\n", batch, batch_stat[batch].glb_service_class1);
-        printf("batch %d mean service time for a class 2 job: %f\n", batch, batch_stat[batch].glb_service_class2);
+    printf("batch %d mean service time: %f\n", batch, batch_stat[batch].glb_service);
+    printf("batch %d mean service time for a class 1 job: %f\n", batch, batch_stat[batch].glb_service_class1);
+    printf("batch %d mean service time for a class 2 job: %f\n", batch, batch_stat[batch].glb_service_class2);
 
 }
 
@@ -195,18 +195,18 @@ void compute_glb_means_and_stds() {
         end_mean->glb_service_class1 = update_running_mean(end_mean->glb_service_class1,
                                                            batch_stat[i].glb_service_class1, i);
         end_std->glb_service_class1 = update_running_sample_sum_sd(end_std->glb_service_class1,
-                                                                     end_mean->glb_service_class1,
-                                                                     batch_stat[i].glb_service_class1, i);
+                                                                   end_mean->glb_service_class1,
+                                                                   batch_stat[i].glb_service_class1, i);
 
         end_mean->glb_service_class2 = update_running_mean(end_mean->glb_service_class2,
                                                            batch_stat[i].glb_service_class2, i);
         end_std->glb_service_class2 = update_running_sample_sum_sd(end_std->glb_service_class2,
-                                                                     end_mean->glb_service_class2,
-                                                                     batch_stat[i].glb_service_class2, i);
+                                                                   end_mean->glb_service_class2,
+                                                                   batch_stat[i].glb_service_class2, i);
 
         end_mean->glb_service = update_running_mean(end_mean->glb_service, batch_stat[i].glb_service, i);
         end_std->glb_service = update_running_sample_sum_sd(end_std->glb_service, end_mean->glb_service,
-                                                              batch_stat[i].glb_service, i);
+                                                            batch_stat[i].glb_service, i);
 
     }
 
@@ -215,5 +215,28 @@ void compute_glb_means_and_stds() {
     end_std->glb_service = sqrt(1.0 * end_std->glb_service / i);
 }
 
+void compute_job_number_mean() {
+
+    int i;
+    end_mean->node = batch_stat[0].avg_node;
+    end_mean->node_cloudlet = batch_stat[0].avg_node_cloudlet;
+    end_mean->node_cloud = batch_stat[0].avg_node_cloud;
+    for (i = 1; i < batch_number; i++) {
+        end_mean->node = update_running_mean(end_mean->node, batch_stat[i].avg_node, i);
+        end_std->node = update_running_sample_sum_sd(end_std->node, end_mean->node,
+                                                     batch_stat[i].avg_node, i);
+
+        end_mean->node_cloudlet = update_running_mean(end_mean->node_cloudlet, batch_stat[i].avg_node_cloudlet, i);
+        end_std->node_cloudlet = update_running_sample_sum_sd(end_std->node_cloudlet, end_mean->node_cloudlet,
+                                                              batch_stat[i].avg_node_cloudlet, i);
+
+        end_mean->node_cloud = update_running_mean(end_mean->node_cloud, batch_stat[i].avg_node_cloud, i);
+        end_std->node_cloud = update_running_sample_sum_sd(end_std->node_cloud, end_mean->node_cloud,
+                                                           batch_stat[i].avg_node_cloud, i);
+    }
+    end_std->node = sqrt(1.0 * end_std->node / i);
+    end_std->node_cloudlet = sqrt(1.0 * end_std->node_cloudlet / i);
+    end_std->node_cloud = sqrt(1.0 * end_std->node_cloud / i);
+}
 
 

@@ -7,7 +7,7 @@
  * Represents the number of tasks
  * in each part of the system
  */
-struct state{
+struct state {
     long cldlet_1;
     long cldlet_2;
     long cloud_1;
@@ -29,12 +29,11 @@ double batch_end;
 double simulation_end;
 
 
-
 /**
  * prints current system state
  * @param st state
  */
-void print_state(struct state st){
+void print_state(struct state st) {
 
     printf("System state: {cloudlet_1 : %ld, cloudlet_2: %ld, cloud_1: %ld, cloud_2: %ld, setup_2: %ld }\n",
            st.cldlet_1, st.cldlet_2, st.cloud_1, st.cloud_2, st.setup_2);
@@ -130,8 +129,7 @@ int dispatch(struct event *event) {
             if (state.cldlet_1 + state.cldlet_2 >= S) {
                 log_debug("Class 2 sent on cloud");
                 return SEND_CLASS_2_TO_CLOUD;
-            }
-            else {
+            } else {
                 log_debug("Class 2 accepted on cloudlet");
                 return ACCEPT_CLASS_2_ON_CLOUDLET;
             }
@@ -318,18 +316,26 @@ int main(int argc, char **argv) {
         compute_batch_global_statistics(current_batch);
     }
 
-//    compute_end_statistics();
+    compute_end_statistics();
     compute_glb_means_and_stds();
+    compute_job_number_mean();
 
-    printf("mean service time: %f std: %f\n", end_mean->glb_service, end_std->glb_service);
-    printf("mean service time for a class 1 job: %f std: %f\n", end_mean->glb_service_class1, end_std->glb_service_class1);
-    printf("mean service time for a class 2 job: %f std: %f\n", end_mean->glb_service_class2, end_std->glb_service_class2);
+    printf("E[N]=%f ; E[N_cloud]=%f ; E[N_cloudlet]=%f\n", end_mean->node, end_mean->node_cloud,
+           end_mean->node_cloudlet);
 
+    printf("E[t]: %f std: %f\n", end_mean->glb_service, end_std->glb_service);
+    printf("E[t_class1]: %f std: %f\n", end_mean->glb_service_class1, end_std->glb_service_class1);
+    printf("E[t_class2]: %f std: %f\n", end_mean->glb_service_class2, end_std->glb_service_class2);
 
 
     double ci_service = estimate_interval_endpoint(end_std->glb_service);
     double ci_service_class1 = estimate_interval_endpoint(end_std->glb_service_class1);
     double ci_service_class2 = estimate_interval_endpoint(end_std->glb_service_class2);
+
+    printf("E[t] - %f <= mu <= E[t] + %f\n", ci_service, ci_service);
+    printf("E[t_class1] - %f <= mu <= E[t_class1] + %f\n", ci_service_class1, ci_service_class1);
+    printf("E[t_class2] - %f <= mu <= E[t_class2] + %f\n", ci_service_class2, ci_service_class2);
+
 
     //TODO compute throughput
     //TODO print su console e su file

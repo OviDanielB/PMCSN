@@ -119,6 +119,8 @@ struct Probabilities *compute_probabilities(int);
 
 double estimate_interval_endpoint(double);
 
+void compute_job_number_mean();
+
 
 
 
