@@ -144,16 +144,20 @@ long *fill_bins(int k,long n){
  * @param k number of bins
  * @param alpha determines confidence level
  * @param n number of run-ups
- * @return
+ * @param stream current rng stream
+ * @return chi statistic of current test
  */
-int run_up_test(int k, double alpha, long n){
+double run_up_test(int k, double alpha, long n, int stream){
     long *o;
     double *p;
 
     double chi, v1, v2;
 
+    PlantSeeds(12345);
+    SelectStream(stream);
+
     printf("---------- RUN-UP TEST STARTING --------\n");
-    printf("Params: {k : %d, n : %ld, alpha: %f} \n", k, n, alpha);
+    printf("Params: {k : %d, n : %ld, alpha: %f, stream: %d} \n", k, n, alpha,stream);
 
     o = fill_bins(k, n);
     p = prob(k);
@@ -168,6 +172,6 @@ int run_up_test(int k, double alpha, long n){
 
     printf("TEST %s! \n", (chi >= v1 && chi <= v2) ? "PASSED" : "FAILED");
     printf("---------- TEST FINISHED ---------\n");
-    return 0;
+    return chi;
 
 }

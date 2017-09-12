@@ -8,4 +8,6 @@
 #endif //PMCSN_EMPIRICAL_TEST_RANDOMNESS_H
 
 
-int run_up_test(int k, double alpha, long n);
+double run_up_test(int k, double alpha, long n, int stream);
+double upper_critical_value(int k, double alpha);
+double lower_critical_value(int k, double alpha);
