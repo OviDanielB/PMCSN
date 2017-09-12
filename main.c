@@ -116,23 +116,23 @@ int is_arrival(struct event *pEvent) {
 int dispatch(struct event *event) {
     switch (event->type) {
         case EVENT_CLASS_1_ARRIVAL:
+
             if (state.cldlet_1 == N) {
                 log_debug("Class 1 sent to cloud");
                 generated->cloud_class_1++;
                 return SEND_CLASS_1_TO_CLOUD;
             } else {
+                generated->cloudlet_class_1++;
+
                 if (state.cldlet_1 + state.cldlet_2 < S) {
                     log_debug("Class 1 accepted on cloudlet");
-                    generated->cloudlet_class_1++;
                     return ACCEPT_CLASS_1_ON_CLOUDLET;
                 } else {
                     if (state.cldlet_2 > 0) {
                         log_debug("Class 1 accepted on cloudlet and class 2 interrupted on cloudlet and sent on cloud");
-                        generated->cloudlet_class_1++;
                         return INTERRUPT_CLASS_2_ON_CLOUDLET_AND_SEND_TO_CLOUD;
                     } else {
                         log_debug("Class 1 accepted on cloudlet");
-                        generated->cloudlet_class_1++;
                         return ACCEPT_CLASS_1_ON_CLOUDLET;
                     }
 
@@ -146,7 +146,7 @@ int dispatch(struct event *event) {
                 return SEND_CLASS_2_TO_CLOUD;
             } else {
                 log_debug("Class 2 accepted on cloudlet");
-                generated->cloudlet_class_2;
+                generated->cloudlet_class_2++;
                 return ACCEPT_CLASS_2_ON_CLOUDLET;
             }
         default:
