@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import scipy.stats as stats
 import os
 import subprocess
 import random
@@ -18,8 +19,16 @@ def generate_data(n):
 
 # load data from file
 a = np.genfromtxt("../simulation_results/res.csv", delimiter=";")
-#plt.hist(a[:, 1], bins=20)
-plt.plot(np.arange(0, 50, 1), a[:, 1])
+plt.hist(a[:, 1], bins=10,normed=True)
+
+# expo = stats.expon
+# x = np.arange(0, 30, 1)
+# param = expo.fit(a[:, 1], floc=0)
+# print(param)
+# pdf_fitted = expo.pdf(x, *param[1:])
+# plt.plot(x, pdf_fitted, 'ro')
+
+#plt.plot(np.arange(0, 50, 1), a[:, 1])
 plt.show()
 
 
