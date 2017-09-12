@@ -92,15 +92,14 @@ struct Batch_stat *compute_batch_service_time(int batch) {
 
     batch_stat[batch].service[CLDLET_CLASS_1] =
             1.0 * area[batch].service[CLDLET_CLASS_1] / completed[batch].cloudlet_class_1;
+
     batch_stat[batch].service[CLDLET_CLASS_2] =
-            1.0 * area[batch].service[CLDLET_CLASS_2] / completed[batch].cloudlet_class_2;
+            1.0 * (area[batch].service[CLDLET_CLASS_2]) / completed[batch].cloudlet_class_2;
+
     batch_stat[batch].service[CLOUD_CLASS_1] =
             1.0 * area[batch].service[CLOUD_CLASS_1] / completed[batch].cloud_class_1;
 
-    batch_stat[batch].service[CLOUD_CLASS_2] = 1.0 * (area[batch].service[CLOUD_CLASS_2] -
-                                                      area[batch].service[CLOUD_INTERRUPTED])
-                                               /
-                                               (completed[batch].cloud_class_2 - completed[batch].interrupted_class_2);
+    batch_stat[batch].service[CLOUD_CLASS_2] = 1.0 * area[batch].service[CLOUD_CLASS_2] / completed[batch].cloud_class_2;
 
     batch_stat[batch].service[CLOUD_INTERRUPTED] = 1.0 * (area[batch].service[CLOUD_INTERRUPTED] +
                                                           area[batch].service[CLDLET_INTERRUPTED]) /
@@ -127,16 +126,17 @@ struct Probabilities *compute_probabilities(int batch) {
 
 
     probs[batch].cloud_class_1 += 1.0 * completed[batch].cloud_class_1 / tot;
-    probs[batch].cloud_class_2 += 1.0 * (completed[batch].cloud_class_2 - completed[batch].interrupted_class_2) / tot;
+    probs[batch].cloud_class_2 += 1.0 * (completed[batch].cloud_class_2) / tot;
     probs[batch].cloudlet_class_1 += 1.0 * completed[batch].cloudlet_class_1 / tot;
     probs[batch].cloudlet_class_2 += 1.0 * completed[batch].cloudlet_class_2 / tot;
-    probs[batch].cloud_class_2_interrupted += 1.0 * completed[batch].interrupted_class_2 / tot;
 
+    //not used very much
+    probs[batch].cloud_class_2_interrupted += 1.0 * completed[batch].interrupted_class_2 / tot;
 
     probs[batch].cloud_class_1_on_1 += 1.0 * completed[batch].cloud_class_1 / tot_class_1;
     probs[batch].cloudlet_class_1_on_1 += 1.0 * completed[batch].cloudlet_class_1 / tot_class_1;
     probs[batch].cloud_class_2_on_2 +=
-            1.0 * (completed[batch].cloud_class_2 - completed[batch].interrupted_class_2) / tot_class_2;
+            1.0 * (completed[batch].cloud_class_2) / tot_class_2;
     probs[batch].cloudlet_class_2_on_2 += 1.0 * completed[batch].cloudlet_class_2 / tot_class_2;
     probs[batch].cloud_class_2_interrupted_on_2 += 1.0 * completed[batch].interrupted_class_2 / tot_class_2;
 
@@ -167,16 +167,13 @@ void compute_batch_global_statistics(int batch) {
                                            probs[batch].cloud_class_1_on_1 * service[CLOUD_CLASS_1];
 
     batch_stat[batch].glb_service_class2 = probs[batch].cloudlet_class_2_on_2 * service[CLDLET_CLASS_2] +
-                                           probs[batch].cloud_class_2_on_2 * service[CLOUD_CLASS_2] +
-                                           probs[batch].cloud_class_2_interrupted_on_2 *
-                                           (service[CLDLET_INTERRUPTED] + service[CLOUD_INTERRUPTED]);
+                                           probs[batch].cloud_class_2_on_2 * service[CLOUD_CLASS_2];
 
     batch_stat[batch].glb_service = probs[batch].cloud_class_1 * service[CLOUD_CLASS_1] +
                                     probs[batch].cloudlet_class_1 * service[CLDLET_CLASS_1] +
                                     probs[batch].cloud_class_2 * service[CLOUD_CLASS_2] +
-                                    probs[batch].cloudlet_class_2 * service[CLDLET_CLASS_2] +
-                                    probs[batch].cloud_class_2_interrupted *
-                                    (service[CLOUD_INTERRUPTED] + service[CLDLET_INTERRUPTED]);
+                                    probs[batch].cloudlet_class_2 * service[CLDLET_CLASS_2];
+
 
     batch_stat[batch].gbl_throughput_cloudlet =
             (completed[batch].cloudlet_class_1 + completed[batch].cloudlet_class_2) / batch_time;
