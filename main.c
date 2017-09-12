@@ -111,17 +111,21 @@ int dispatch(struct event *event) {
         case EVENT_CLASS_1_ARRIVAL:
             if (state.cldlet_1 == N) {
                 log_debug("Class 1 sent to cloud");
+                generated->cloud_class_1++;
                 return SEND_CLASS_1_TO_CLOUD;
             } else {
                 if (state.cldlet_1 + state.cldlet_2 < S) {
                     log_debug("Class 1 accepted on cloudlet");
+                    generated->cloudlet_class_1++;
                     return ACCEPT_CLASS_1_ON_CLOUDLET;
                 } else {
                     if (state.cldlet_2 > 0) {
                         log_debug("Class 1 accepted on cloudlet and class 2 interrupted on cloudlet and sent on cloud");
+                        generated->cloudlet_class_1++;
                         return INTERRUPT_CLASS_2_ON_CLOUDLET_AND_SEND_TO_CLOUD;
                     } else {
                         log_debug("Class 1 accepted on cloudlet");
+                        generated->cloudlet_class_1++;
                         return ACCEPT_CLASS_1_ON_CLOUDLET;
                     }
 
@@ -131,9 +135,11 @@ int dispatch(struct event *event) {
         case EVENT_CLASS_2_ARRIVAL:
             if (state.cldlet_1 + state.cldlet_2 >= S) {
                 log_debug("Class 2 sent on cloud");
+                generated->cloud_class_2++;
                 return SEND_CLASS_2_TO_CLOUD;
             } else {
                 log_debug("Class 2 accepted on cloudlet");
+                generated->cloudlet_class_2;
                 return ACCEPT_CLASS_2_ON_CLOUDLET;
             }
         default:
@@ -317,6 +323,8 @@ int main(int argc, char **argv) {
         compute_batch_service_time(current_batch);
         compute_probabilities(current_batch);
         compute_batch_global_statistics(current_batch);
+
+        compute_utilization(current_batch);
     }
 
     compute_end_statistics();
@@ -341,6 +349,8 @@ int main(int argc, char **argv) {
     printf("E[t] - %f <= mu <= E[t] + %f\n", ci_service, ci_service);
     printf("E[t_class1] - %f <= mu <= E[t_class1] + %f\n", ci_service_class1, ci_service_class1);
     printf("E[t_class2] - %f <= mu <= E[t_class2] + %f\n", ci_service_class2, ci_service_class2);
+
+    printf("mean utilization for cloudlet = %f\n", end_mean->ro);
 
     FILE *file = open_results_file();
     write_s_resp_time_throu(file, S, end_mean->glb_service, end_mean->gbl_throughput, end_mean->service[0],
