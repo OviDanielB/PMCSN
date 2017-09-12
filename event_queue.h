@@ -11,6 +11,7 @@ struct event {
     struct event *prev;
     struct event *next;
     double job_size;
+    double interrupted_size
 };
 
 /**

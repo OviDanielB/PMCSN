@@ -1,35 +1,25 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats as stats
-import os
-import subprocess
-import random
-
-#os.remove("../simulation_results/res.csv")
-
-# generates csv file with response time results
-def generate_data(n):
-    seed = 1234
-    for x in range(n):
-        output = subprocess.check_output(['../PMCSN', str(x), str(x), '100', '512', str(int(seed))])
-        seed += random.random() * 100
-
-#generate_data(80)
 
 
-# load data from file
-a = np.genfromtxt("../simulation_results/res.csv", delimiter=";")
-print(a)
-plt.hist(a[:, 1], bins=20, normed=True)
+job_resp_times_vector = np.genfromtxt("../simulation_results/job_resp_times.csv", delimiter=";")
+plt.axis([0, 25, 0, 0.30])
+plt.hist(job_resp_times_vector, bins=70, normed=True, alpha=0.5)
 
-lognorm = stats.lognorm
-x = np.linspace(0, 80, 1)
-param = lognorm.fit(a[:, 1], floc=0)
-print(param)
-pdf_fitted = lognorm.pdf(x, *param)
-plt.plot(x, pdf_fitted, 'ro')
+# exponential lambda
+mean = job_resp_times_vector.mean()
 
-#plt.plot(np.arange(0, 80, 1), a[:, 1])
+x = np.arange(0, 25, 0.5)
+#param = stats.expon.fit(job_resp_times_vector)
+# calculate ideal exponential pdf with parameter mean
+pdf_fitted = stats.expon.pdf(x, scale=mean)
+
+plt.plot(x, pdf_fitted, 'r', linewidth=3.0)
+plt.xlabel("Response time values")
+plt.ylabel("Probability")
+plt.title("General Response Time Fitting")
+
 plt.show()
 
 

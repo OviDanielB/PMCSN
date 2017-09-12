@@ -248,6 +248,7 @@ struct event *create_and_insert_event(int type, double time) {
     event->time = time;
     event->type = type;
     event->job_size = -1; // default value
+    event->interrupted_size = -1; // default value
 
     if (!is_empty()) {
         if (event->time < head->time) {

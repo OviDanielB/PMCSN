@@ -215,10 +215,16 @@ void execute_arrival(struct event *arrival_event, int action) {
             /* compute new service time for interrupted job in the cloud */
             double class_2_cloud_service_time = getServiceClass2Cloud();
             double class_2_cloud_remaining_time = class_2_cloud_service_time * job_remaining_percentage;
+            /* add setup time (exponentially distributed) */
             double service_time = class_2_cloud_remaining_time + getSetup();
             area[current_batch].service[CLOUD_INTERRUPTED] += service_time;
             ev = create_and_insert_event(EVENT_CLASS_2_CLOUD_COMPLETION, time.current + service_time);
             ev->job_size = ev->time - arrival_event->time;
+
+            /* add the job size executed on cloudlet until interruption;
+             * used later for computing job's TOTAL size in the system
+             */
+            ev->interrupted_size = wasted_time;
 
             /*For the job just entered that caused the class 2 job's interruption */
             ev = create_and_insert_event(EVENT_CLASS_1_CLOUDLET_COMPLETION, time.current + getServiceClass1Cloudlet());
@@ -251,6 +257,14 @@ void execute_arrival(struct event *arrival_event, int action) {
 }
 
 void execute_completion(struct event *event) {
+
+    /**
+     * if event->interrupted_size != -1, then the job has been interrupted
+     * on cloudlet so the total size must take in account the
+     * job's processing time on the cloudlet plus the time it executed on cloud
+     */
+    double total_size = event->interrupted_size != -1 ? (event->interrupted_size + event->job_size) : event->job_size;
+    write_job_resp_time(job_resp_times_file, total_size);
 
     switch (event->type) {
         case EVENT_CLASS_1_CLOUDLET_COMPLETION:
