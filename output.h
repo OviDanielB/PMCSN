@@ -33,6 +33,12 @@ struct Completed {
     long interrupted_class_2;   //#jobs of class 2 interrupted in the cloudlet
 };
 
+struct Generated {
+    long cloudlet_class_1;
+    long cloudlet_class_2;
+    long cloud_class_1;
+    long cloud_class_2;
+};
 /**
  * Statistics gathering structure to calculate time-averaged numbers.
  * service[CLOUD_INTERRUPTED:4]:    Time elapsed in cloudlet by an interrupted job
@@ -63,6 +69,9 @@ struct Probabilities {
     double cloud_class_2_on_2;              // class_2 completed on cloud (without interrupted jobs) / #class_2
     double cloud_class_2_interrupted_on_2;  // class_2 interrupted / class_2
 
+    double p11;                             // #class_1 entering in cloudlet / #entering in cloudlet
+    double p12;                             // #class_2 entering in cloudlet / #entering in cloudlet
+
 };
 
 struct Batch_stat {
@@ -74,6 +83,8 @@ struct Batch_stat {
     double glb_service_class1;  //E[T] for class_1 jobs
     double glb_service_class2;  //E[T] for a class_2 jobs
     double glb_service;         //E[T] for any jobs
+
+    double ro;
 
     double gbl_throughput_cloudlet;
     double gbl_throughput_cloud;
@@ -90,6 +101,8 @@ struct End_mean {
     double glb_service_class2;  //E[T] for a class_2 jobs
     double glb_service;         //E[T] for any jobs
 
+    double ro;
+
     double gbl_throughput_cloudlet;
     double gbl_throughput_cloud;
     double gbl_throughput;
@@ -104,6 +117,8 @@ struct End_std {
     double glb_service_class1;
     double glb_service_class2;
     double glb_service;
+
+    double ro;
 };
 
 struct Completed *completed;
@@ -112,6 +127,7 @@ struct Batch_stat *batch_stat;
 struct End_mean *end_mean;
 struct End_std *end_std;
 struct Probabilities *probs;
+struct Generated *generated;
 
 void init_output_stats();
 
@@ -131,4 +147,4 @@ void compute_job_number_mean();
 
 void compute_throughput_mean();
 
-
+void compute_utilization(int);

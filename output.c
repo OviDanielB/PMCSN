@@ -38,6 +38,12 @@ void init_output_stats() {
         exit(EXIT_FAILURE);
     }
 
+    generated = calloc(1, sizeof(struct Batch_stat));
+    if (generated == NULL) {
+        fprintf(stderr, "error in memory allocation\n");
+        exit(EXIT_FAILURE);
+    }
+
     t_star = idfStudent(batch_number - 1, 1 - ALPHA / 2);
 
 }
@@ -99,7 +105,8 @@ struct Batch_stat *compute_batch_service_time(int batch) {
     batch_stat[batch].service[CLOUD_CLASS_1] =
             1.0 * area[batch].service[CLOUD_CLASS_1] / completed[batch].cloud_class_1;
 
-    batch_stat[batch].service[CLOUD_CLASS_2] = 1.0 * area[batch].service[CLOUD_CLASS_2] / completed[batch].cloud_class_2;
+    batch_stat[batch].service[CLOUD_CLASS_2] =
+            1.0 * area[batch].service[CLOUD_CLASS_2] / completed[batch].cloud_class_2;
 
     batch_stat[batch].service[CLOUD_INTERRUPTED] = 1.0 * (area[batch].service[CLOUD_INTERRUPTED] +
                                                           area[batch].service[CLDLET_INTERRUPTED]) /
@@ -140,8 +147,24 @@ struct Probabilities *compute_probabilities(int batch) {
     probs[batch].cloudlet_class_2_on_2 += 1.0 * completed[batch].cloudlet_class_2 / tot_class_2;
     probs[batch].cloud_class_2_interrupted_on_2 += 1.0 * completed[batch].interrupted_class_2 / tot_class_2;
 
+
+//    probs[batch].p11 = 1.0 * completed->cloudlet_class_1 / (completed->cloudlet_class_1 + completed->cloudlet_class_2);
+//    probs[batch].p12 = 1.0 * completed->cloudlet_class_2 / (completed->cloudlet_class_1 + completed->cloudlet_class_2);
+
+    probs[batch].p11 = 1.0 * generated->cloudlet_class_1 / (generated->cloudlet_class_1 + generated->cloudlet_class_2);
+    probs[batch].p12 = 1.0 * generated->cloudlet_class_2 / (generated->cloudlet_class_1 + generated->cloudlet_class_2);
+
     return probs;
 
+}
+
+void compute_utilization(int batch) {
+
+    double service_cloudlet = probs[batch].cloudlet_class_1 * batch_stat[batch].service[CLDLET_CLASS_1] +
+                              probs[batch].cloudlet_class_2 * batch_stat[batch].service[CLDLET_CLASS_2];
+
+    batch_stat[batch].ro = 1.0 * (probs[batch].p11 * CLASS_1_ARRIVAL_RATE + probs[batch].p12 * CLASS_2_ARRIVAL_RATE) *
+                           service_cloudlet / N;
 }
 
 void compute_end_statistics() {
@@ -193,6 +216,7 @@ void compute_glb_means_and_stds() {
     end_mean->glb_service_class1 = batch_stat[0].glb_service_class1;
     end_mean->glb_service_class2 = batch_stat[0].glb_service_class2;
     end_mean->glb_service = batch_stat[0].glb_service;
+    end_mean->ro = batch_stat[0].glb_service;
 
     for (i = 1; i < batch_number; i++) {
         end_mean->glb_service_class1 = update_running_mean(end_mean->glb_service_class1,
@@ -211,6 +235,9 @@ void compute_glb_means_and_stds() {
         end_std->glb_service = update_running_sample_sum_sd(end_std->glb_service, end_mean->glb_service,
                                                             batch_stat[i].glb_service, i);
 
+        end_mean->ro = update_running_mean(end_mean->ro, batch_stat[i].ro, i);
+        end_std->ro = update_running_sample_sum_sd(end_std->ro, end_mean->ro,
+                                                            batch_stat[i].ro, i);
     }
 
     end_std->glb_service_class1 = sqrt(1.0 * end_std->glb_service_class1 / i);
