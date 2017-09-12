@@ -25,12 +25,19 @@ struct {
     double next;
 } time = {0.0, 0.0};
 
+void open_files();
+
 int seed = 12345;
 
 int current_batch = 0;                   // batch in execution
 double batch_end;
 double simulation_end;
 
+FILE *job_resp_times_file;
+
+void open_files() {
+    job_resp_times_file = open_job_resp_times_file();
+}
 
 /**
  * prints current system state
@@ -302,6 +309,7 @@ int main(int argc, char **argv) {
     PlantSeeds(seed);
     init_arrival();
     init_output_stats();
+    open_files();
 
     for (current_batch = 0; current_batch < batch_number; current_batch++) {
 
@@ -346,3 +354,4 @@ int main(int argc, char **argv) {
 
     return 0;
 }
+

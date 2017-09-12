@@ -15,6 +15,7 @@ long fact(int x);
 void log_debug(char * msg);
 
 FILE *open_results_file();
+FILE *open_job_resp_times_file();
 FILE *open_indep_test_results_file(long n);
 
 void write_s_resp_time_throu(FILE *fp,int S, double resp_time, double throughput);

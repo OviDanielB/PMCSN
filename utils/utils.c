@@ -5,9 +5,11 @@
 #import <math.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 
 int LOG = 1; /* if 1 log is enabled, 0 is disabled */
+
 
 long fact(int x){
     int c;
@@ -64,6 +66,7 @@ FILE * open_results_file(){
     FILE *fp = fopen("../simulation_results/res.csv","a+");
     if(fp == NULL){
         fprintf(stderr,"Opening simulation results file problem \n");
+        exit(EXIT_FAILURE);
     }
     return fp;
 }
@@ -79,6 +82,16 @@ FILE *open_indep_test_results_file(long n){
     FILE *fp = fopen(file_path,"w+");
     if(fp == NULL){
         fprintf(stderr,"Opening independence results file problem \n");
+        exit(EXIT_FAILURE);
+    }
+    return fp;
+}
+
+FILE *open_job_resp_times_file(){
+    FILE *fp = fopen("../simulation_results/job_resp_times.csv","w");
+    if(fp == NULL){
+        fprintf(stderr,"Opening job service times file problem \n");
+        exit(EXIT_FAILURE);
     }
     return fp;
 }
@@ -86,4 +99,10 @@ FILE *open_indep_test_results_file(long n){
 
 void write_s_resp_time_throu(FILE *fp, int S, double resp_time, double throughput){
     fprintf(fp,"%d; %f; %f\n", S,resp_time,throughput);
+}
+
+
+void write_job_resp_time(FILE *fp, double time){
+    fprintf(fp,"%f\n",time);
+
 }

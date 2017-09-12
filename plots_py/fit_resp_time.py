@@ -14,21 +14,22 @@ def generate_data(n):
         output = subprocess.check_output(['../PMCSN', str(x), str(x), '100', '512', str(int(seed))])
         seed += random.random() * 100
 
-#generate_data(50)
+#generate_data(80)
 
 
 # load data from file
 a = np.genfromtxt("../simulation_results/res.csv", delimiter=";")
-plt.hist(a[:, 1], bins=10,normed=True)
+print(a)
+plt.hist(a[:, 1], bins=20, normed=True)
 
-# expo = stats.expon
-# x = np.arange(0, 30, 1)
-# param = expo.fit(a[:, 1], floc=0)
-# print(param)
-# pdf_fitted = expo.pdf(x, *param[1:])
-# plt.plot(x, pdf_fitted, 'ro')
+lognorm = stats.lognorm
+x = np.linspace(0, 80, 1)
+param = lognorm.fit(a[:, 1], floc=0)
+print(param)
+pdf_fitted = lognorm.pdf(x, *param)
+plt.plot(x, pdf_fitted, 'ro')
 
-#plt.plot(np.arange(0, 50, 1), a[:, 1])
+#plt.plot(np.arange(0, 80, 1), a[:, 1])
 plt.show()
 
 
