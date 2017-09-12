@@ -374,10 +374,13 @@ int main(int argc, char **argv) {
 
     printf("mean utilization for cloudlet = %f\n", end_mean->ro);
 
+
     FILE *file = open_results_file();
     write_s_resp_time_throu(file, S, end_mean->glb_service, end_mean->gbl_throughput, end_mean->service[0],
                             end_mean->service[1], end_mean->service[2], end_mean->service[3], end_mean->service[4]);
     fclose(file);
+
+    write_s_mean_resp_time(S, N, end_mean->glb_service);
 
     return 0;
 }
