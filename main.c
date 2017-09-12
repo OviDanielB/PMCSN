@@ -3,7 +3,6 @@
 #include "event_time_generator.h"
 #include "output.h"
 
-
 /**
  * Represents the number of tasks
  * in each part of the system
@@ -87,7 +86,7 @@ void init_params(int argc, char **argv) {
     S = read_int(argv, 2);
     batch_number = read_int(argv, 3);
     batch_time = read_int(argv, 4);
-    seed = read_int(argv,5);
+    seed = read_int(argv, 5);
 
     simulation_end = (batch_number) * batch_time;
 
@@ -211,6 +210,7 @@ void execute_arrival(struct event *arrival_event, int action) {
             /* update service time spent for interrupted jobs */
             double wasted_time = time.current - (class_2_event_cloudlet->time - class_2_event_cloudlet->job_size);
             area[current_batch].service[CLDLET_INTERRUPTED] += wasted_time;
+            area[current_batch].service[CLDLET_CLASS_2] += wasted_time;
 
             /* compute new service time for interrupted job in the cloud */
             double class_2_cloud_service_time = getServiceClass2Cloud();
@@ -332,8 +332,10 @@ int main(int argc, char **argv) {
     compute_job_number_mean();
     compute_throughput_mean();
 
-    printf("E[N]=%f ; E[N_cloudlet]=%f ; E[N_cloud]=%f\n", end_mean->node, end_mean->node_cloudlet, end_mean->node_cloud);
-    printf("tht=%f  tht_cloudlet=%f ; tht_cloud=%f\n", end_mean->gbl_throughput, end_mean->gbl_throughput_cloudlet, end_mean->gbl_throughput_cloud);
+    printf("E[N]=%f ; E[N_cloudlet]=%f ; E[N_cloud]=%f\n", end_mean->node, end_mean->node_cloudlet,
+           end_mean->node_cloud);
+    printf("tht=%f  tht_cloudlet=%f ; tht_cloud=%f\n", end_mean->gbl_throughput, end_mean->gbl_throughput_cloudlet,
+           end_mean->gbl_throughput_cloud);
 
     printf("E[t]: %f std: %f\n", end_mean->glb_service, end_std->glb_service);
     printf("E[t_class1]: %f std: %f\n", end_mean->glb_service_class1, end_std->glb_service_class1);
@@ -349,7 +351,8 @@ int main(int argc, char **argv) {
     printf("E[t_class2] - %f <= mu <= E[t_class2] + %f\n", ci_service_class2, ci_service_class2);
 
     FILE *file = open_results_file();
-    write_s_resp_time_throu(file, S, end_mean->glb_service, end_mean->gbl_throughput);
+    write_s_resp_time_throu(file, S, end_mean->glb_service, end_mean->gbl_throughput, end_mean->service[0],
+                            end_mean->service[1], end_mean->service[2], end_mean->service[3], end_mean->service[4]);
     fclose(file);
 
     return 0;

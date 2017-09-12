@@ -96,9 +96,9 @@ FILE *open_job_resp_times_file(){
     return fp;
 }
 
-
-void write_s_resp_time_throu(FILE *fp, int S, double resp_time, double throughput){
-    fprintf(fp,"%d; %f; %f\n", S,resp_time,throughput);
+void write_s_resp_time_throu(FILE *fp, int S, double resp_time, double throughput, double res0, double res1, double res2,
+                             double res3, double res4) {
+    fprintf(fp, "%d; %f; %f; %f; %f; %f; %f; %f\n", S, resp_time, throughput, res0, res1, res2, res3, res4);
 }
 
 
