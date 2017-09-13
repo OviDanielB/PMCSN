@@ -352,12 +352,19 @@ int main(int argc, char **argv) {
     compute_end_statistics();
     compute_glb_means_and_stds();
     compute_job_number_mean();
-    compute_throughput_mean();
+    compute_throughput();
+
+    double ci_th = estimate_interval_endpoint(end_std->gbl_throughput);
+    double ci_th_cloud = estimate_interval_endpoint(end_std->gbl_throughput_cloud);
+    double ci_th_cloudlet = estimate_interval_endpoint(end_std->gbl_throughput_cloudlet);
 
     printf("E[N]=%f ; E[N_cloudlet]=%f ; E[N_cloud]=%f\n", end_mean->node, end_mean->node_cloudlet,
            end_mean->node_cloud);
-    printf("tht=%f  tht_cloudlet=%f ; tht_cloud=%f\n", end_mean->gbl_throughput, end_mean->gbl_throughput_cloudlet,
+    printf("avg values: tht=%f ;  tht_cloudlet=%f ; tht_cloud=%f\n", end_mean->gbl_throughput, end_mean->gbl_throughput_cloudlet,
            end_mean->gbl_throughput_cloud);
+    printf("standard deviation tht:%f ;tht_cloudlet=%f ; tht_cloud=%f\n", end_std->gbl_throughput, end_std->gbl_throughput_cloudlet,
+           end_std->gbl_throughput_cloud);
+    printf("confidence interval tht: %f tht_cloudlet: %f tht_cloud: %f\n", ci_th,ci_th_cloudlet,ci_th_cloud);
 
     printf("E[t]: %f std: %f\n", end_mean->glb_service, end_std->glb_service);
     printf("E[t_class1]: %f std: %f\n", end_mean->glb_service_class1, end_std->glb_service_class1);
