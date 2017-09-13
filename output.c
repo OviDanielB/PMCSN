@@ -112,7 +112,7 @@ struct Batch_stat *compute_batch_service_time(int batch) {
                                                    completed[batch].interrupted_class_2;
 
     batch_stat[batch].service[CLDLET_INTERRUPTED] = 1.0 * area[batch].service[CLDLET_INTERRUPTED] /
-                                                    completed[batch].interrupted_class_2;
+                                                    completed[batch].cloudlet_class_2;
 
     for (i = 0; i < 6; i++) {
         int fp = fpclassify(batch_stat[batch].service[i]);
