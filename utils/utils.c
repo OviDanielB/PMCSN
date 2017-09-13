@@ -63,7 +63,7 @@ void log_debug(char *msg){
 
 FILE * open_results_file(){
 
-    FILE *fp = fopen("../simulation_results/res.csv","a+");
+    FILE *fp = fopen("./simulation_results/res.csv","a+");
     if(fp == NULL){
         fprintf(stderr,"Opening simulation results file problem \n");
         exit(EXIT_FAILURE);
@@ -102,8 +102,8 @@ void write_s_resp_time_throu(FILE *fp, int S, double resp_time, double interval_
     fprintf(fp, "%d; %f; %f; %f; %f; %f; %f; %f; %f; %f\n", S, resp_time, interval_r, throughput, interval_t, res0, res1, res2, res3, res4);
 }
 
-void write_s_minn_resp_time(int S, int N, double resp){
-    FILE *fp = fopen("../simulation_results/s_min_resp_time.csv","a+");
+void write_s_min_resp_time(int S, int N, double resp){
+    FILE *fp = fopen("./simulation_results/s_min_resp_time.csv","a+");
     if(fp == NULL){
         fprintf(stderr,"Opening s_min_resp_time.csv file problem \n");
         exit(EXIT_FAILURE);

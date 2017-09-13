@@ -108,12 +108,13 @@ struct Batch_stat *compute_batch_service_time(int batch) {
     batch_stat[batch].service[CLOUD_CLASS_2] =
             1.0 * area[batch].service[CLOUD_CLASS_2] / completed[batch].cloud_class_2;
 
-    batch_stat[batch].service[CLOUD_INTERRUPTED] = 1.0 * (area[batch].service[CLOUD_INTERRUPTED] +
-                                                          area[batch].service[CLDLET_INTERRUPTED]) /
+    batch_stat[batch].service[CLOUD_INTERRUPTED] = 1.0 * area[batch].service[CLOUD_INTERRUPTED] /
                                                    completed[batch].interrupted_class_2;
 
+    batch_stat[batch].service[CLDLET_INTERRUPTED] = 1.0 * area[batch].service[CLDLET_INTERRUPTED] /
+                                                    completed[batch].interrupted_class_2;
 
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < 6; i++) {
         int fp = fpclassify(batch_stat[batch].service[i]);
         if (fp == FP_NAN || fp == FP_INFINITE)
             batch_stat[batch].service[i] = 0;
@@ -170,7 +171,7 @@ void compute_utilization(int batch) {
 void compute_end_statistics() {
 
     int i = 0, type;
-    for (type = 0; type < 5; type++) {
+    for (type = 0; type < 6; type++) {
         end_mean->service[type] = batch_stat[0].service[type];
         for (i = 1; i < batch_number; i++) {
             end_mean->service[type] = update_running_mean(end_mean->service[type], batch_stat[i].service[type], i);
