@@ -118,6 +118,9 @@ struct End_std {
     double glb_service_class2;
     double glb_service;
 
+    double gbl_throughput_cloudlet;
+    double gbl_throughput_cloud;
+    double gbl_throughput;
     double ro;
 };
 
@@ -148,3 +151,5 @@ void compute_job_number_mean();
 void compute_throughput_mean();
 
 void compute_utilization(int);
+
+void compute_throughput();

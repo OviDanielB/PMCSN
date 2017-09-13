@@ -237,7 +237,7 @@ void compute_glb_means_and_stds() {
 
         end_mean->ro = update_running_mean(end_mean->ro, batch_stat[i].ro, i);
         end_std->ro = update_running_sample_sum_sd(end_std->ro, end_mean->ro,
-                                                            batch_stat[i].ro, i);
+                                                   batch_stat[i].ro, i);
     }
 
     end_std->glb_service_class1 = sqrt(1.0 * end_std->glb_service_class1 / i);
@@ -267,6 +267,37 @@ void compute_job_number_mean() {
     end_std->node = sqrt(1.0 * end_std->node / i);
     end_std->node_cloudlet = sqrt(1.0 * end_std->node_cloudlet / i);
     end_std->node_cloud = sqrt(1.0 * end_std->node_cloud / i);
+}
+
+
+void compute_throughput() {
+
+    int i;
+    end_mean->gbl_throughput = batch_stat[0].gbl_throughput;
+    end_mean->gbl_throughput_cloud = batch_stat[0].gbl_throughput_cloud;
+    end_mean->gbl_throughput_cloudlet = batch_stat[0].gbl_throughput_cloudlet;
+
+    for (i = 1; i < batch_number; i++) {
+        end_mean->gbl_throughput = update_running_mean(end_mean->gbl_throughput, batch_stat[i].gbl_throughput, i);
+        end_std->gbl_throughput = update_running_sample_sum_sd(end_std->gbl_throughput, end_mean->gbl_throughput,
+                                                               batch_stat[i].gbl_throughput, i);
+
+        end_mean->gbl_throughput_cloud = update_running_mean(end_mean->gbl_throughput_cloud,
+                                                             batch_stat[i].gbl_throughput_cloud, i);
+        end_std->gbl_throughput_cloud = update_running_sample_sum_sd(end_std->gbl_throughput_cloud,
+                                                                     end_mean->gbl_throughput_cloud,
+                                                                     batch_stat[i].gbl_throughput_cloud, i);
+
+        end_mean->gbl_throughput_cloudlet = update_running_mean(end_mean->gbl_throughput_cloudlet,
+                                                                batch_stat[i].gbl_throughput_cloudlet, i);
+        end_std->gbl_throughput_cloudlet = update_running_sample_sum_sd(end_std->gbl_throughput_cloudlet,
+                                                                        end_mean->gbl_throughput_cloudlet,
+                                                                        batch_stat[i].gbl_throughput_cloudlet, i);
+    }
+
+    end_std->gbl_throughput = sqrt(1.0 * end_std->gbl_throughput / i);
+    end_std->gbl_throughput_cloud = sqrt(1.0 * end_std->gbl_throughput_cloud / i);
+    end_std->gbl_throughput_cloudlet = sqrt(1.0 * end_std->gbl_throughput_cloudlet / i);
 }
 
 void compute_throughput_mean() {
