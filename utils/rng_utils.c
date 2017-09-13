@@ -93,13 +93,9 @@ int find_succ_full_period(long *a, long *m, long *fp_arr)
 
     long i = 1, x = *a;
 
-    //(fp_arr++);
-    //fp_arr--;
-
-
     while (x != 1){
         if( (gcd(i, *m - 1) == 1) && (*m % x < *m / x)){ /* x is a full-period multiplier of m */
-            // TODO insert into array
+            //  insert into list
             printf("x = %ld\n",x);
         }
         i++;
@@ -130,7 +126,7 @@ long find_first_fp_mc(long *m)
         }
     }
 
-    /* no fp-mc multiplier found*/
+    /* no fp-mc multiplier found */
     return 0;
 
 }

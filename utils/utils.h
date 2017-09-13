@@ -18,6 +18,6 @@ FILE *open_results_file();
 FILE *open_job_resp_times_file();
 FILE *open_indep_test_results_file(long n);
 
-void write_s_mean_resp_time(int,int,double);
+void write_s_minn_resp_time(int, int, double);
 void write_s_resp_time_throu(FILE *fp,int S, double resp_time, double throughput, double , double , double , double, double);
 void write_job_resp_time(FILE *fp, double time);

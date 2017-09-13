@@ -35,7 +35,7 @@ double simulation_end;
 FILE *job_resp_times_file;
 
 void open_files() {
-    job_resp_times_file = open_job_resp_times_file();
+    // job_resp_times_file = open_job_resp_times_file();
 }
 
 /**
@@ -270,7 +270,8 @@ void execute_completion(struct event *event) {
      * job's processing time on the cloudlet plus the time it executed on cloud
      */
     double total_size = event->interrupted_size != -1 ? (event->interrupted_size + event->job_size) : event->job_size;
-    write_job_resp_time(job_resp_times_file, total_size);
+    // TODO write job size
+    //write_job_resp_time(job_resp_times_file, total_size);
 
     switch (event->type) {
         case EVENT_CLASS_1_CLOUDLET_COMPLETION:
@@ -380,7 +381,7 @@ int main(int argc, char **argv) {
                             end_mean->service[1], end_mean->service[2], end_mean->service[3], end_mean->service[4]);
     fclose(file);
 
-    write_s_mean_resp_time(S, N, end_mean->glb_service);
+    write_s_minn_resp_time(S, N, end_mean->glb_service);
 
     return 0;
 }
