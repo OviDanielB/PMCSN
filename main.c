@@ -32,10 +32,25 @@ int current_batch = 0;                   // batch in execution
 double batch_end;
 double simulation_end;
 
+
+double global_resp_time_sum = 0.0;
+long completed_tasks = 0;
+
 FILE *job_resp_times_file;
+
+FILE *transient_file;
+
+void increment_completed(){
+    completed_tasks++;
+}
+
+void increase_glb_resp_time_sum(double rt){
+    global_resp_time_sum += rt;
+}
 
 void open_files() {
     // job_resp_times_file = open_job_resp_times_file();
+    transient_file = open_transient_file();
 }
 
 /**
@@ -273,6 +288,10 @@ void execute_completion(struct event *event) {
     // TODO write job size
     //write_job_resp_time(job_resp_times_file, total_size);
 
+    increment_completed();
+    increase_glb_resp_time_sum(event->job_size);
+    write_time_resp(transient_file, event->time, global_resp_time_sum / completed_tasks);
+
     switch (event->type) {
         case EVENT_CLASS_1_CLOUDLET_COMPLETION:
             state.cldlet_1--;
@@ -387,6 +406,7 @@ int main(int argc, char **argv) {
     printf("E[t_cloudlet1]=%f; E[t_cloudlet2]=%f; E[t_cloud1]=%f\n; E[t_cloud2]=%f; E[t_cloud_interrupted]=%f; E[t_cldlet_wasted]=%f\n",
            end_mean->service[0], end_mean->service[1], end_mean->service[2],
            end_mean->service[3], end_mean->service[4], end_mean->service[5]);
+
 
     FILE *file = open_results_file();
     write_s_resp_time_throu(file, S, end_mean->glb_service, ci_service, end_mean->gbl_throughput, ci_th,
