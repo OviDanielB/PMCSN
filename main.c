@@ -361,11 +361,13 @@ int main(int argc, char **argv) {
 
     printf("E[N]=%f ; E[N_cloudlet]=%f ; E[N_cloud]=%f\n", end_mean->node, end_mean->node_cloudlet,
            end_mean->node_cloud);
-    printf("avg values: tht=%f ;  tht_cloudlet=%f ; tht_cloud=%f\n", end_mean->gbl_throughput, end_mean->gbl_throughput_cloudlet,
+    printf("avg values: tht=%f ;  tht_cloudlet=%f ; tht_cloud=%f\n", end_mean->gbl_throughput,
+           end_mean->gbl_throughput_cloudlet,
            end_mean->gbl_throughput_cloud);
-    printf("standard deviation tht:%f ;tht_cloudlet=%f ; tht_cloud=%f\n", end_std->gbl_throughput, end_std->gbl_throughput_cloudlet,
+    printf("standard deviation tht:%f ;tht_cloudlet=%f ; tht_cloud=%f\n", end_std->gbl_throughput,
+           end_std->gbl_throughput_cloudlet,
            end_std->gbl_throughput_cloud);
-    printf("confidence interval tht: %f tht_cloudlet: %f tht_cloud: %f\n", ci_th,ci_th_cloudlet,ci_th_cloud);
+    printf("confidence interval tht: %f tht_cloudlet: %f tht_cloud: %f\n", ci_th, ci_th_cloudlet, ci_th_cloud);
 
     printf("E[t]: %f std: %f\n", end_mean->glb_service, end_std->glb_service);
     printf("E[t_class1]: %f std: %f\n", end_mean->glb_service_class1, end_std->glb_service_class1);
@@ -382,13 +384,17 @@ int main(int argc, char **argv) {
 
     printf("mean utilization for cloudlet = %f\n", end_mean->ro);
 
+    printf("E[t_cloudlet1]=%f; E[t_cloudlet2]=%f; E[t_cloud1]=%f\n; E[t_cloud2]=%f; E[t_cloud_interrupted]=%f; E[t_cldlet_wasted]=%f\n",
+           end_mean->service[0], end_mean->service[1], end_mean->service[2],
+           end_mean->service[3], end_mean->service[4], end_mean->service[5]);
 
     FILE *file = open_results_file();
-    write_s_resp_time_throu(file, S, end_mean->glb_service, ci_service, end_mean->gbl_throughput, ci_th, end_mean->service[0],
-                            end_mean->service[1], end_mean->service[2]);
+    write_s_resp_time_throu(file, S, end_mean->glb_service, ci_service, end_mean->gbl_throughput, ci_th,
+                            end_mean->service[0],
+                            end_mean->service[1], end_mean->service[2], end_mean->service[3], end_mean->service[4]);
     fclose(file);
 
-    write_s_minn_resp_time(S, N, end_mean->glb_service);
+    write_s_min_resp_time(S, N, end_mean->glb_service);
 
     return 0;
 }

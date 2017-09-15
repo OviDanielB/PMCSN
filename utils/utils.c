@@ -63,7 +63,7 @@ void log_debug(char *msg){
 
 FILE * open_results_file(){
 
-    FILE *fp = fopen("../simulation_results/res.csv","a+");
+    FILE *fp = fopen("./simulation_results/res.csv","a+");
     if(fp == NULL){
         fprintf(stderr,"Opening simulation results file problem \n");
         exit(EXIT_FAILURE);
@@ -73,11 +73,12 @@ FILE * open_results_file(){
 
 FILE *open_indep_test_results_file(long n){
     char buffer [50];
-    char file_path[200];
+    char file_path[300];
     strcpy(file_path, "../simulation_results/ind_test_res");
     sprintf (buffer, "_n_%ld.csv" , n );
 
     strcat(file_path, buffer);
+    printf(file_path);
 
     FILE *fp = fopen(file_path,"w+");
     if(fp == NULL){
@@ -96,13 +97,13 @@ FILE *open_job_resp_times_file(){
     return fp;
 }
 
-void write_s_resp_time_throu(FILE *fp, int S, double resp_time, double throughput, double res0, double res1, double res2,
-                             double res3, double res4) {
-    fprintf(fp, "%d; %f; %f; %f; %f; %f; %f; %f\n", S, resp_time, throughput, res0, res1, res2, res3, res4);
+void write_s_resp_time_throu(FILE *fp, int S, double resp_time, double interval_r, double throughput, double interval_t,
+                             double res0, double res1, double res2, double res3, double res4) {
+    fprintf(fp, "%d; %f; %f; %f; %f; %f; %f; %f; %f; %f\n", S, resp_time, interval_r, throughput, interval_t, res0, res1, res2, res3, res4);
 }
 
-void write_s_minn_resp_time(int S, int N, double resp){
-    FILE *fp = fopen("../simulation_results/s_min_resp_time.csv","a+");
+void write_s_min_resp_time(int S, int N, double resp){
+    FILE *fp = fopen("./simulation_results/s_min_resp_time.csv","a+");
     if(fp == NULL){
         fprintf(stderr,"Opening s_min_resp_time.csv file problem \n");
         exit(EXIT_FAILURE);

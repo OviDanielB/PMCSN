@@ -44,9 +44,6 @@ struct Generated {
  * service[CLOUD_INTERRUPTED:4]:    Time elapsed in cloudlet by an interrupted job
  * service[CLDLET_INTERRUPTED:5]:   Remaining time in cloud + setup
  *
- *i.e cservice[CLOUD_INTERRUPTED:4] - service[CLDLET_INTERRUPTED:5] = amount of time spent in service by class 2 jobs
- *                                                                    sent directly at the cloud node
- *
  */
 struct Area {
     double node;
@@ -79,7 +76,7 @@ struct Batch_stat {
     double avg_node_cloudlet;
     double avg_node_cloud;
 
-    double service[5];
+    double service[6];
     double glb_service_class1;  //E[T] for class_1 jobs
     double glb_service_class2;  //E[T] for a class_2 jobs
     double glb_service;         //E[T] for any jobs
@@ -96,7 +93,7 @@ struct End_mean {
     double node_cloudlet;
     double node_cloud;
 
-    double service[5];
+    double service[6];
     double glb_service_class1;  //E[T] for class_1 jobs
     double glb_service_class2;  //E[T] for a class_2 jobs
     double glb_service;         //E[T] for any jobs
@@ -113,7 +110,7 @@ struct End_std {
     double node_cloudlet;
     double node_cloud;
 
-    double service[5];
+    double service[6];
     double glb_service_class1;
     double glb_service_class2;
     double glb_service;
