@@ -75,7 +75,7 @@
 long batch_number;  // #batches
 double batch_time;  // time dedicated to one batch
 
-int N;              // max jobs in the queue
+int N;              // number of servers
 int S;              // threshold value
 
 

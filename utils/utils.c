@@ -85,6 +85,16 @@ FILE * open_results_file(){
     return fp;
 }
 
+FILE * open_resps_thts_file(){
+
+    FILE *fp = fopen("../simulation_results/resps_thts.csv","a+");
+    if(fp == NULL){
+        fprintf(stderr,"Opening simulation results file problem \n");
+        exit(EXIT_FAILURE);
+    }
+    return fp;
+}
+
 FILE *open_indep_test_results_file(long n){
     char buffer [50];
     char file_path[300];
@@ -103,7 +113,7 @@ FILE *open_indep_test_results_file(long n){
 }
 
 FILE *open_job_resp_times_file(){
-    FILE *fp = fopen("../simulation_results/job_resp_times.csv","w+");
+    FILE *fp = fopen("./simulation_results/job_resp_times.csv","w+");
     if(fp == NULL){
         fprintf(stderr,"Opening job service times file problem \n");
         exit(EXIT_FAILURE);
@@ -133,3 +143,35 @@ void write_job_resp_time(FILE *fp, double time){
     fprintf(fp,"%f\n",time);
 
 }
+
+void write_resps_thts_file(FILE *fp, int S, double res0, double res1, double res2, double res3, double res4, double res5, double res6,
+                           double res7, double res8, double res9, double res10, double res11, double res12, double res13,
+                           double res14, double res15){
+    fprintf(fp,"%d;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f\n",S,res0,res1,res2,res3,res4,res5,res6,res7,res8,res9,res10,res11,
+            res11,res12,res13,res14,res15);
+
+}
+
+void write_convergence_file(int seed, int task_number, double time) {
+    FILE *fp = fopen("./simulation_results/tasks_convergence.csv","a+");
+    if(fp == NULL){
+        fprintf(stderr,"Opening tasks_convergence.csv file problem \n");
+        exit(EXIT_FAILURE);
+    }
+
+    fprintf(fp,"%d; %d; %f\n",seed,task_number,time);
+
+    fclose(fp);
+}
+
+
+
+FILE *open_convergence_file() {
+    FILE *fp = fopen("./simulation_results/tasks_convergence.csv","w+");
+    if(fp == NULL){
+        fprintf(stderr,"Opening convergence file problem \n");
+        exit(EXIT_FAILURE);
+    }
+    return fp;
+}
+

@@ -78,14 +78,20 @@ struct Batch_stat {
 
     double service[6];
     double glb_service_class1;  //E[T] for class_1 jobs
-    double glb_service_class2;  //E[T] for a class_2 jobs
+    double glb_service_class2;  //E[T] for class_2 jobs
+    double glb_service_cloudlet;
+    double glb_service_cloud;
     double glb_service;         //E[T] for any jobs
 
     double ro;
 
-    double gbl_throughput_cloudlet;
-    double gbl_throughput_cloud;
+    double gbl_throughput_cloudlet1;
+    double gbl_throughput_cloudlet2;
+    double gbl_throughput_cloud1;
+    double gbl_throughput_cloud2;
     double gbl_throughput;
+
+    double gbl_interrupted_cloudlet2;
 };
 
 struct End_mean {
@@ -96,13 +102,19 @@ struct End_mean {
     double service[6];
     double glb_service_class1;  //E[T] for class_1 jobs
     double glb_service_class2;  //E[T] for a class_2 jobs
+    double glb_service_cloudlet;
+    double glb_service_cloud;
     double glb_service;         //E[T] for any jobs
 
     double ro;
 
-    double gbl_throughput_cloudlet;
-    double gbl_throughput_cloud;
+    double gbl_throughput_cloudlet1;
+    double gbl_throughput_cloudlet2;
+    double gbl_throughput_cloud1;
+    double gbl_throughput_cloud2;
     double gbl_throughput;
+
+    double gbl_interrupted_cloudlet2;
 };
 
 struct End_std {
@@ -113,12 +125,18 @@ struct End_std {
     double service[6];
     double glb_service_class1;
     double glb_service_class2;
+    double glb_service_cloudlet;
+    double glb_service_cloud;
     double glb_service;
 
-    double gbl_throughput_cloudlet;
-    double gbl_throughput_cloud;
+    double gbl_throughput_cloudlet1;
+    double gbl_throughput_cloudlet2;
+    double gbl_throughput_cloud1;
+    double gbl_throughput_cloud2;
     double gbl_throughput;
     double ro;
+
+    double gbl_interrupted_cloudlet2;
 };
 
 struct Completed *completed;

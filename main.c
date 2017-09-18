@@ -375,17 +375,17 @@ int main(int argc, char **argv) {
     compute_throughput();
 
     double ci_th = estimate_interval_endpoint(end_std->gbl_throughput);
-    double ci_th_cloud = estimate_interval_endpoint(end_std->gbl_throughput_cloud);
-    double ci_th_cloudlet = estimate_interval_endpoint(end_std->gbl_throughput_cloudlet);
+    double ci_th_cloud = estimate_interval_endpoint(end_std->gbl_throughput_cloud1+end_std->gbl_throughput_cloud2);
+    double ci_th_cloudlet = estimate_interval_endpoint(end_std->gbl_throughput_cloudlet1+end_std->gbl_interrupted_cloudlet2);
 
     printf("E[N]=%f ; E[N_cloudlet]=%f ; E[N_cloud]=%f\n", end_mean->node, end_mean->node_cloudlet,
            end_mean->node_cloud);
     printf("avg values: tht=%f ;  tht_cloudlet=%f ; tht_cloud=%f\n", end_mean->gbl_throughput,
-           end_mean->gbl_throughput_cloudlet,
-           end_mean->gbl_throughput_cloud);
+           end_mean->gbl_throughput_cloudlet1 + end_mean->gbl_throughput_cloudlet2,
+           end_mean->gbl_throughput_cloud1 + end_mean->gbl_throughput_cloud2);
     printf("standard deviation tht:%f ;tht_cloudlet=%f ; tht_cloud=%f\n", end_std->gbl_throughput,
-           end_std->gbl_throughput_cloudlet,
-           end_std->gbl_throughput_cloud);
+           end_std->gbl_throughput_cloudlet1 + end_std->gbl_throughput_cloudlet2,
+           end_std->gbl_throughput_cloud1 + end_std->gbl_throughput_cloudlet2);
     printf("confidence interval tht: %f tht_cloudlet: %f tht_cloud: %f\n", ci_th, ci_th_cloudlet, ci_th_cloud);
 
     printf("E[t]: %f std: %f\n", end_mean->glb_service, end_std->glb_service);
@@ -410,8 +410,22 @@ int main(int argc, char **argv) {
 
     FILE *file = open_results_file();
     write_s_resp_time_throu(file, S, end_mean->glb_service, ci_service, end_mean->gbl_throughput, ci_th,
-                            end_mean->service[0],
-                            end_mean->service[1], end_mean->service[2], end_mean->service[3], end_mean->service[4]);
+                            end_mean->service[0], end_mean->service[1], end_mean->service[2],
+                            end_mean->service[3], end_mean->service[4]);
+
+    FILE *resp_tht = open_resps_thts_file();
+    /* t1 cloudlet, t1 cloud, t1 global, t2 cloudlet, t2 cloud, t2 global, t cloudlet global, t cloud global
+     * tht1 cldlet, tht1 cloud, tht1 global, tht2 cldlet, tht2 cloud, tht2 global,
+     * t2 wasted, interrupted */
+    write_resps_thts_file(resp_tht, S,
+                          end_mean->service[0], end_mean->service[2], end_mean->glb_service_class1,
+                          end_mean->service[1], end_mean->service[3], end_mean->glb_service_class2,
+                          end_mean->glb_service_cloudlet, end_mean->glb_service_cloud,
+                          end_mean->gbl_throughput_cloudlet1, end_mean->gbl_throughput_cloud1,
+                          end_mean->gbl_throughput_cloudlet1+end_mean->gbl_throughput_cloud1,
+                          end_mean->gbl_throughput_cloudlet2, end_mean->gbl_throughput_cloud2,
+                          end_mean->gbl_throughput_cloudlet2+end_mean->gbl_throughput_cloud2,
+                          end_mean->service[5], end_mean->gbl_interrupted_cloudlet2);
     fclose(file);
 
     write_s_min_resp_time(S, N, end_mean->glb_service);
