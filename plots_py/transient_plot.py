@@ -43,6 +43,8 @@ transient_time3 = np.full((len(a[len2:, 1]), 1), rt_mean3)
 rt_mean = (rt_mean1+rt_mean2+rt_mean3) / 3
 tot_t_t = np.full((len(a[:, 1]), 1), rt_mean)
 
+plt.figure(1)
+
 plt.axis([0, max(a[:, 0]), 0, max(a[:, 1]) + 0.5])
 plt.xlabel("time")
 plt.ylabel("Mean response time E[T]")
@@ -50,6 +52,32 @@ plt.plot(a[:len1, 0], a[:len1, 1], color='#2272f4', linewidth=2.0)
 plt.plot(a[len1:len2, 0], a[len1:len2, 1], color='#11c61a', linewidth=2.0)
 plt.plot(a[len2:, 0], a[len2:, 1], color='#a0139b', linewidth=2.0)
 plt.plot(a[:, 0], tot_t_t, 'grey', linewidth=1.0)
+
+a_patch = mpatches.Patch(color='#2272f4', label='Seed '+str(seed1))
+b_patch = mpatches.Patch(color='#11c61a', label='Seed '+str(seed2))
+c_patch = mpatches.Patch(color='#a0139b', label='Seed '+str(seed3))
+plt.legend(handles=[a_patch, b_patch, c_patch])
+
+
+plt.figure(2)
+
+n_mean1 = np.mean(a[:len1, 2])
+time1 = np.full((len(a[:len1, 2]), 1), n_mean1)
+n_mean2 = np.mean(a[len1:len2, 2])
+time2 = np.full((len(a[len1:len2, 2]), 1), n_mean2)
+n_mean3 = np.mean(a[len2:, 2])
+time3 = np.full((len(a[len2:, 2]), 1), n_mean3)
+
+n_mean = (n_mean1+n_mean2+n_mean3) / 3
+tot_n_t = np.full((len(a[:, 2]), 1), n_mean)
+
+plt.axis([0, max(a[:, 0]), 0, max(a[:, 2]) + 0.5])
+plt.xlabel("time")
+plt.ylabel("Mean tasks E[N]")
+plt.plot(a[:len1, 0], a[:len1, 2], color='#2272f4', linewidth=2.0)
+plt.plot(a[len1:len2, 0], a[len1:len2, 2], color='#11c61a', linewidth=2.0)
+plt.plot(a[len2:, 0], a[len2:, 2], color='#a0139b', linewidth=2.0)
+plt.plot(a[:, 0], tot_n_t, 'grey', linewidth=1.0)
 
 a_patch = mpatches.Patch(color='#2272f4', label='Seed '+str(seed1))
 b_patch = mpatches.Patch(color='#11c61a', label='Seed '+str(seed2))
