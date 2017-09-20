@@ -20,7 +20,7 @@ FILE *open_indep_test_results_file(long n);
 FILE *open_transient_file();
 FILE *open_resps_thts_file();
 
-void write_time_resp(FILE *fp, double time, double rt);
+void write_time_resp(FILE *fp, double time, double rt, double);
 void write_s_min_resp_time(int,int,double);
 void write_s_resp_time_throu(FILE *fp,int S, double, double, double, double, double , double , double , double, double);
 void write_job_resp_time(FILE *fp, double time);

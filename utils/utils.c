@@ -60,8 +60,8 @@ void log_debug(char *msg){
         printf("%s \n",msg);
 }
 
-void write_time_resp(FILE *fp, double time, double rt){
-    fprintf(fp,"%f; %f\n", time , rt);
+void write_time_resp(FILE *fp, double time, double rt, double jobs){
+    fprintf(fp,"%f; %f; %f\n", time , rt, jobs);
 
 }
 
@@ -147,8 +147,9 @@ void write_job_resp_time(FILE *fp, double time){
 void write_resps_thts_file(FILE *fp, int S, double res0, double res1, double res2, double res3, double res4, double res5, double res6,
                            double res7, double res8, double res9, double res10, double res11, double res12, double res13,
                            double res14, double res15){
-    fprintf(fp,"%d;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f\n",S,res0,res1,res2,res3,res4,res5,res6,res7,res8,res9,res10,res11,
-            res11,res12,res13,res14,res15);
+    fprintf(fp,"%d;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f\n",S,
+            res0,res1,res2,res3,res4,res5,res6,res7,res8,res9,res10,res11,
+            res12,res13,res14,res15);
 
 }
 
